@@ -1,31 +1,42 @@
 import ReactDOM from "react-dom/client";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
-import Home from "./containers/home";
-import Login from "./containers/login";
-import Signup from "./containers/signup";
-import TopNavbar from "./containers/TopNavbar";
-import NotFound from "./containers/NotFound";
+import {BrowserRouter} from "react-router-dom";
 
+
+import { Amplify } from 'aws-amplify';
+import config from './config';
+// import { AppContext } from "./lib/contextLib";
+import App from "./App";
+
+Amplify.configure({
+  Auth: {
+    mandatorySignIn: true,
+    region: config.cognito.REGION,
+    userPoolId: config.cognito.USER_POOL_ID,
+    identityPoolId: config.cognito.IDENTITY_POOL_ID,
+    userPoolWebClientId: config.cognito.APP_CLIENT_ID
+  },
+  Storage: {
+    region: config.s3.REGION,
+    bucket: config.s3.BUCKET,
+    identityPoolId: config.cognito.IDENTITY_POOL_ID
+  },
+  API: {
+    endpoints: [
+      {
+        name: "notes",
+        endpoint: config.apiGateway.URL,
+        region: config.apiGateway.REGION
+      },
+    ]
+  }
+});
 
 const root = ReactDOM.createRoot(
   document.getElementById("root")
 );
 root.render(
-  <div>
   <BrowserRouter>
-  <TopNavbar />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="login" element={<Login />} />
-      <Route path="signup" element={<Signup />} />
-      <Route path="*" element={<NotFound />}/>
-      
+    <App />
     
-    </Routes>
   </BrowserRouter>
-  </div>
 );
