@@ -118,7 +118,7 @@ async function handleLogout() {
           {/* <Route path="spotprice" element={<SpotPrice_2/>} /> */}
           {/* <Route path="spotprice2" element={<SpotPrice2/>} /> */}
           <Route path="login" element={<Login />} />
-          {/* <Route path="signup" element={<Signup />} /> */}
+          <Route path="signup" element={<Signup />} />
           {/* <Route path="power" element={<PowerBar/>} /> */}
           {/* <Route path="revenueline" element={<RevenueChart/>} /> */}
           {/* <Route path="revenuebar" element={<RevenueBarTP/>} /> */}

@@ -77,7 +77,7 @@ const EnergyBarTP = () => {
         setIsError(false);
         // setIsLoading(true);
         try{
-        const result = await fetch(`${fullURL}`)
+        const result = await fetch(`${fullURL}`,{mode: 'cors'})
         const json = await result.json()
         // console.log("json", json)
         setChart(json)
