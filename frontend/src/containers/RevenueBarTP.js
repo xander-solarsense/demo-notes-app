@@ -95,7 +95,7 @@ export default function RevenueBarTP() {
             fetchData()
         },60000)
         return () => clearInterval(intervalId)
-    }, []);
+    }, [query]);
     
     
 
