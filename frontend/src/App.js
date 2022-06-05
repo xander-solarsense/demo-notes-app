@@ -19,6 +19,7 @@ import { onError } from "./lib/errorLib";
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Dashboard from './containers/Dashboard'
+import "./App.css"
 
 export default function App() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -53,11 +54,15 @@ async function handleLogout() {
   return (
     !isAuthenticating && (
       <div>
-        <Container>
+        <Container fluid>
           <Navbar collapseOnSelect bg="light" expand="md" className="mb-3">
             <LinkContainer to="/">
               <Navbar.Brand className="font-weight-bold text-muted">
-                SolarSense
+                <img 
+                src="../mediumSolarSense.png"
+                height="70"
+                width="170"
+                />
               </Navbar.Brand>
             </LinkContainer>
           <Navbar.Toggle />
