@@ -12,6 +12,7 @@ import Testf from "./Testf"
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
+
 ChartJS.register(
     BarElement,
     CategoryScale,
@@ -203,7 +204,7 @@ const PowerBar = () => {
     //    <Col>
         <div style={{height:250, width:175}}>
             
-                <Bar
+                <Bar className='mt-5'
                 data = {data}
                 options = {options}
                 

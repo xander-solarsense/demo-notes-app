@@ -7,7 +7,11 @@ import Container from 'react-bootstrap/Container'
 import RevenueBarTP from './RevenueBarTP'
 import { useAppContext } from "../lib/contextLib";
 import Login from "./login.js"
-
+import SpotPrice from './SpotPrice'
+import Weather from './Weather'
+import Map from '../components/Map'
+import SpotLine from './SpotLine'
+import Card from 'react-bootstrap/Card'
 
 const Dashboard = () => {
   const { isAuthenticated } = useAppContext();
@@ -24,19 +28,44 @@ const Dashboard = () => {
   const renderDashboard = () => {
     return (
         <div>
-            <Container>
-          <Row>
-          <Col lg={5}>
-            <EnergyBarTP/>    
-          </Col>
-            <Col lg={5}>
-                <RevenueBarTP/>
-            </Col>
-            <Col lg={2}>
-            <PowerBar/>
-            </Col>
-        </Row>
-        </Container>
+          <Container>
+            <Card>
+              <Row lg={3}>
+              <Col lg={6}>
+                {/* <Card> */}
+                  <EnergyBarTP/>   
+                {/* </Card> */}
+              </Col>
+              <Col lg={2}>
+                {/* <Card> */}
+                <PowerBar/>
+                {/* </Card> */}
+              </Col>
+              <Col lg={4}>
+                {/* <Card> */}
+                  <Weather/>
+                {/* </Card> */}
+              </Col>
+            </Row>
+            </Card>
+            <Row lg={2}>
+              <Col >
+                <Card className='mt-3'>
+                  <RevenueBarTP/>
+                </Card>
+              </Col>
+              <Col>
+                <Card className='mt-3'>
+                  <SpotLine />
+                </Card>
+              </Col>
+            </Row>
+            {/* <Row>
+              <Col>
+                <Map/>
+              </Col>
+            </Row> */}
+          </Container>
         </div>
     )
   }

@@ -21,6 +21,7 @@ import Col from "react-bootstrap/Col"
 import Dashboard from './containers/Dashboard'
 import "./App.css"
 
+
 export default function App() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [isAuthenticated, userHasAuthenticated] = useState(false);

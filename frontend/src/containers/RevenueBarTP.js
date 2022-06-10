@@ -161,7 +161,7 @@ export default function RevenueBarTP() {
     }
     return (
         <div>
-            <Container>
+            <Container className='mt-3'>
                 <ButtonGroup size="sm" className="mb-3">
                     <Button onClick = {() => {
                         setQuery(beginsWithQueryString)

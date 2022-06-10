@@ -9,7 +9,6 @@ import axios from 'axios'
 import Button from 'react-bootstrap/Button'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import Card from 'react-bootstrap/Card'
 
 
 
@@ -48,7 +47,7 @@ function toIsoString(date) {
   
   
 
-const EnergyBarTP = () => {
+const SpotLine = () => {
     var dt = new Date();
     var dtYesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000))
     var isoTimeYesterday = toIsoString(dtYesterday)
@@ -70,18 +69,18 @@ const EnergyBarTP = () => {
     const [isError, setIsError] = useState(false);
     const [query, setQuery] = useState(beginsWithQueryString)
     const [seconds,setSeconds] = useState(0)
-   
     var fullURL = `${baseURL}${query}`
-
+    
     const fetchData = async () => {
-        console.log("running fetch")
+        // console.log("before fetch",chart)
         setIsError(false);
         // setIsLoading(true);
         try{
-        const result = await fetch(`${fullURL}`,{mode: 'cors'})
+        const result = await fetch(`${fullURL}`)
         const json = await result.json()
         // console.log("json", json)
         setChart(json)
+        console.log("updated spot price")
         } catch (error) {
             setIsError(true);
         }
@@ -91,9 +90,8 @@ const EnergyBarTP = () => {
     useEffect(() => {
         fetchData()
         
-        // fetchData()
         const intervalId = setInterval(() => {
-            console.log("updated energy!")
+            // console.log("updated revenue bar")
             fetchData()
         },60000)
         return () => clearInterval(intervalId)
@@ -103,21 +101,21 @@ const EnergyBarTP = () => {
 
     if (! isLoading) {
     
-    console.log("Energy bar data", chart)
+    console.log("chart", chart)
     var data = {
         labels: chart.Items.map(x => x.trading_period),
         datasets: [{
             lineTension: 0.3,
             pointRadius: 1,
-            label: `Energy`,
-            data: chart.Items.map(x => (x.tp_energy).toFixed(2)),
+            label: `Spot Price`,
+            data: chart.Items.map(x => (x.spot_price).toFixed(2)),
             backgroundColor: [
-                'orange'
+                'rgba(0,128,0,0.8'
             ],
             borderColor: [
-                'orange',
+                'green',
             ],
-            borderWidth: 0,
+            borderWidth: 3,
             datalabels: {
                 display: false
               },
@@ -135,7 +133,7 @@ const EnergyBarTP = () => {
             },  
             title:{
                 display: true,
-                text: `Energy per Trading Period ${isoDateToday}`
+                text: `Spot Price HLY0331 per MWh ${isoDateToday}`
                 }, 
         },
         responsive: true,
@@ -155,7 +153,7 @@ const EnergyBarTP = () => {
             y: {
                 title: {
                     display: true,
-                    text: 'Power in Wh'
+                    text: 'Spot Price in $ per MWh'
                 },
                 min: 0
             }
@@ -163,7 +161,7 @@ const EnergyBarTP = () => {
     }
     return (
         <div>
-            <Container className="mt-2">
+            <Container className='mt-3'>
                 <ButtonGroup size="sm" className="mb-3">
                     <Button onClick = {() => {
                         setQuery(beginsWithQueryString)
@@ -179,7 +177,7 @@ const EnergyBarTP = () => {
                     </Button>
                     
                 </ButtonGroup>
-                <Bar
+                <Line
                 data = {data}
                 options = {options}
                 />
@@ -187,10 +185,11 @@ const EnergyBarTP = () => {
         </div>
     )
 } else {
-    return (
-        <h3 className='text-center'>Loading...</h3>
+    return(
+        <div>
+            <h3 className='text-center'>Loading Revenue Chart...</h3>
+        </div>
     )
 }
 }
-
-export default EnergyBarTP
+export default SpotLine
