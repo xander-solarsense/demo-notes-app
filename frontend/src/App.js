@@ -20,7 +20,7 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Dashboard from './containers/Dashboard'
 import "./App.css"
-
+import Test from './containers/Test'
 
 export default function App() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -92,6 +92,7 @@ async function handleLogout() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={isAuthenticated ? <Signup /> : <Login />}/>
           <Route path="dashboard" element={<Dashboard/>} />
+          {/* <Route path="test" element={<Test/>} /> */}
           <Route path="*" element={<NotFound />}/>
         </Routes>
       </AppContext.Provider>

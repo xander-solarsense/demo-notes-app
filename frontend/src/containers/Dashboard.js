@@ -7,11 +7,12 @@ import Container from 'react-bootstrap/Container'
 import RevenueBarTP from './RevenueBarTP'
 import { useAppContext } from "../lib/contextLib";
 import Login from "./login.js"
-import SpotPrice from './SpotPrice'
 import Weather from './Weather'
-import Map from '../components/Map'
 import SpotLine from './SpotLine'
 import Card from 'react-bootstrap/Card'
+import DashCard from './DashCard'
+
+import Status from './Status'
 
 const Dashboard = () => {
   const { isAuthenticated } = useAppContext();
@@ -29,42 +30,41 @@ const Dashboard = () => {
     return (
         <div>
           <Container>
-            <Card>
-              <Row lg={3}>
-              <Col lg={6}>
-                {/* <Card> */}
-                  <EnergyBarTP/>   
-                {/* </Card> */}
-              </Col>
-              <Col lg={2}>
-                {/* <Card> */}
-                <PowerBar/>
-                {/* </Card> */}
+            <Row lg={2}>
+              <Col lg={8}>
+                <DashCard/>
               </Col>
               <Col lg={4}>
-                {/* <Card> */}
-                  <Weather/>
-                {/* </Card> */}
+                <Status/>
               </Col>
             </Row>
+            
+            <Card>
+              <Row lg={3}>
+                <Col lg={6}>
+                  <EnergyBarTP/>   
+                </Col>
+                <Col lg ={2}>
+                  <PowerBar/>
+                </Col>
+                <Col lg={4}>
+                  <Weather/>
+                </Col>
+              </Row>
             </Card>
+            
             <Row lg={2}>
               <Col >
-                <Card className='mt-3'>
+                <Card className='mt-3 mb-3'>
                   <RevenueBarTP/>
                 </Card>
               </Col>
               <Col>
-                <Card className='mt-3'>
+                <Card className='mt-3 mb-3'>
                   <SpotLine />
                 </Card>
               </Col>
             </Row>
-            {/* <Row>
-              <Col>
-                <Map/>
-              </Col>
-            </Row> */}
           </Container>
         </div>
     )

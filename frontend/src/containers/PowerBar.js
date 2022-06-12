@@ -8,7 +8,7 @@ import axios from 'axios'
 import Button from 'react-bootstrap/Button'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import Testf from "./Testf"
+
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
@@ -76,6 +76,7 @@ const PowerBar = () => {
       // console.log({fullURL})
       // console.log("json", json)
       setChart(json)
+      console.log("current power",chart)
       } catch (error) {
           setIsError(true);
       }
@@ -202,9 +203,9 @@ const PowerBar = () => {
     //     </div>
     //     </Col>
     //    <Col>
-        <div style={{height:250, width:175}}>
+        <div style={{height:300, width:190}}>
             
-                <Bar className='mt-5'
+                <Bar 
                 data = {data}
                 options = {options}
                 
