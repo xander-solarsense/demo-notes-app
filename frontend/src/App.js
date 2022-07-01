@@ -10,14 +10,10 @@ import {
   Routes,
   Route,
   useNavigate,
-  Navigate
 } from "react-router-dom";
 import { AppContext } from "./lib/contextLib";
 import { Auth } from "aws-amplify";
 import { onError } from "./lib/errorLib";
-// import Testf from "./containers/Testf"
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
 import Dashboard from './containers/Dashboard'
 import "./App.css"
 import Test from './containers/Test'
@@ -61,6 +57,7 @@ async function handleLogout() {
               <Navbar.Brand className="font-weight-bold text-muted">
                 <img 
                 src="../mediumSolarSense.png"
+                alt="sun icon"
                 height="70"
                 width="170"
                 />

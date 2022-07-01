@@ -1,14 +1,15 @@
 import React, {useState, useEffect} from 'react'
-import { Chart as ChartJS, LineElement, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Interaction, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
-import {Line} from 'react-chartjs-2'
+import { Chart as ChartJS, LineElement, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
+
 import {Bar} from 'react-chartjs-2'
 import Container from 'react-bootstrap/Container'
 import 'date-fns'
 import 'chartjs-adapter-date-fns'
-import axios from 'axios'
+
 import Button from 'react-bootstrap/Button'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import Spinner from 'react-bootstrap/Spinner'
 
 
 
@@ -25,8 +26,6 @@ ChartJS.register(
     Title,
     ChartDataLabels,
     Legend,
-    BarElement
-    // Interaction
 )
 function toIsoString(date) {
     var tzo = -date.getTimezoneOffset(),
@@ -66,9 +65,7 @@ const SpotPrice = () => {
     
     const [chart, setChart] = useState([])
     const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
     const [query, setQuery] = useState(beginsWithQueryString)
-    const [seconds,setSeconds] = useState(0)
     var fullURL = `${baseURL}${query}`
     
     const fetchData = async () => {
@@ -82,7 +79,7 @@ const SpotPrice = () => {
         setChart(json)
         console.log("updated spot price")
         } catch (error) {
-            setIsError(true);
+            console.log(error);
         }
         setIsLoading(false);
     };
@@ -91,7 +88,6 @@ const SpotPrice = () => {
         fetchData()
         
         const intervalId = setInterval(() => {
-            // console.log("updated revenue bar")
             fetchData()
         },60000)
         return () => clearInterval(intervalId)
@@ -187,7 +183,7 @@ const SpotPrice = () => {
 } else {
     return(
         <div>
-            <h3 className='text-center'>Loading Revenue Chart...</h3>
+            <Spinner animation="border" />
         </div>
     )
 }

@@ -1,21 +1,20 @@
 import React, {useState, useEffect} from 'react'
-import { Chart as ChartJS, LineElement, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Interaction, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
-import {Line} from 'react-chartjs-2'
+import { Chart as ChartJS, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
 import {Bar} from 'react-chartjs-2'
 import Container from 'react-bootstrap/Container'
 import 'date-fns'
 import 'chartjs-adapter-date-fns'
-import axios from 'axios'
 import Button from 'react-bootstrap/Button'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import Spinner from 'react-bootstrap/Spinner'
+
 
 
 
 
 
 ChartJS.register(
-    LineElement,
     PointElement,
     CategoryScale,
     LinearScale,
@@ -25,8 +24,7 @@ ChartJS.register(
     Title,
     ChartDataLabels,
     Legend,
-    BarElement
-    // Interaction
+    BarElement,
 )
 function toIsoString(date) {
     var tzo = -date.getTimezoneOffset(),
@@ -45,44 +43,51 @@ function toIsoString(date) {
         ':' + pad(Math.abs(tzo) % 60);
   }
   
-  
-
-export default function RevenueBarTP() {
-    var dt = new Date();
+  const getIsoTimeYesterday = () => {
     var dtYesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000))
     var isoTimeYesterday = toIsoString(dtYesterday)
-    var isoTimeNow = toIsoString(dt)
-    var isoDateToday = isoTimeNow.slice(0,10)
-    var device_id = 'x_inv_tp'
-    // var beginsWithQueryString = `${device_id}/${isoTimeNow.slice(0,10)}`
-    var beginsWithQueryString = `${device_id}/${isoDateToday}`
-    var lastDayQueryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
-    
 
-    
-    var baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
-    
-   
+    return isoTimeYesterday
+ }
+  
+ const getIsoTimeNow = () => {
+    var dt = new Date();
+    var isoTime = toIsoString(dt);
+  
+    return isoTime
+  }
+
+export default function RevenueBarTP() {
+
+    const device_id = 'x_inv_tp'
+    const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
     
     const [chart, setChart] = useState([])
     const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
-    const [query, setQuery] = useState(beginsWithQueryString)
-    const [seconds,setSeconds] = useState(0)
-    var fullURL = `${baseURL}${query}`
+    const [query, setQuery] = useState("Today")
     
     const fetchData = async () => {
-        // console.log("before fetch",chart)
-        setIsError(false);
-        // setIsLoading(true);
+        var isoTimeYesterday = getIsoTimeYesterday()
+        var isoTimeNow = getIsoTimeNow()
+        var isoDateToday = isoTimeNow.slice(0,10)
+
+        if (query == "Today") {
+            var queryString = `${device_id}/${isoDateToday}`
+        } else if (query == "Last 24 Hours") {
+            var queryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
+        }
+
+        var fullURL = `${baseURL}${queryString}`
+
         try{
         const result = await fetch(`${fullURL}`)
         const json = await result.json()
-        // console.log("json", json)
+        // console.log("json", json)x
         setChart(json)
-        console.log("updated revenue bar")
+        console.log(`Updated revenue chart at ${isoTimeNow}`, chart.Items)
+        console.log(`Revenue chart URL: ${fullURL}`)
         } catch (error) {
-            setIsError(true);
+            console.log(error);
         }
         setIsLoading(false);
     };
@@ -91,7 +96,6 @@ export default function RevenueBarTP() {
         fetchData()
         
         const intervalId = setInterval(() => {
-            // console.log("updated revenue bar")
             fetchData()
         },60000)
         return () => clearInterval(intervalId)
@@ -101,7 +105,7 @@ export default function RevenueBarTP() {
 
     if (! isLoading) {
     
-    console.log("chart", chart)
+  
     var data = {
         labels: chart.Items.map(x => x.trading_period),
         datasets: [{
@@ -125,15 +129,12 @@ export default function RevenueBarTP() {
     }
     var options = {
         plugins: {
-            
-        },
-        plugins: {
             legend: {
               display: false
             },  
             title:{
                 display: true,
-                text: `Revenue per Trading Period ${isoDateToday}`
+                text: `Revenue per Trading Period ${query}`
                 }, 
         },
         responsive: true,
@@ -164,15 +165,11 @@ export default function RevenueBarTP() {
             <Container className='mt-3'>
                 <ButtonGroup size="sm" className="mb-3">
                     <Button onClick = {() => {
-                        setQuery(beginsWithQueryString)
-        
-                        console.log("fullURL",{fullURL})
+                        setQuery("Today")
                         }}>Today
                     </Button>
                     <Button onClick = {() => {
-                        setQuery(lastDayQueryString)
-                        console.log("query",{query})
-                        console.log({fullURL})
+                        setQuery("Last 24 Hours")
                         }}>Last 24 Hours
                     </Button>
                     
@@ -187,7 +184,7 @@ export default function RevenueBarTP() {
 } else {
     return(
         <div>
-            <h3 className='text-center'>Loading Revenue Chart...</h3>
+            <Spinner animation="border" />
         </div>
     )
 }

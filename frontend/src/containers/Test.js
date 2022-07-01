@@ -5,7 +5,7 @@ import Status from './Status'
 const Test = () => {
     return (
         <div>
-        <Status/>
+        <DashCard/>
         </div>
     )
 }

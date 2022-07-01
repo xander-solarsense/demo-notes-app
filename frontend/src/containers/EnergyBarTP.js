@@ -1,15 +1,13 @@
 import React, {useState, useEffect} from 'react'
-import { Chart as ChartJS, LineElement, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Interaction, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
-import {Line} from 'react-chartjs-2'
+import { Chart as ChartJS, LineElement, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
 import {Bar} from 'react-chartjs-2'
 import Container from 'react-bootstrap/Container'
 import 'date-fns'
 import 'chartjs-adapter-date-fns'
-import axios from 'axios'
 import Button from 'react-bootstrap/Button'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import Card from 'react-bootstrap/Card'
+import Spinner from 'react-bootstrap/Spinner'
 
 
 
@@ -27,8 +25,8 @@ ChartJS.register(
     ChartDataLabels,
     Legend,
     BarElement
-    // Interaction
 )
+
 function toIsoString(date) {
     var tzo = -date.getTimezoneOffset(),
         dif = tzo >= 0 ? '+' : '-',
@@ -46,44 +44,50 @@ function toIsoString(date) {
         ':' + pad(Math.abs(tzo) % 60);
   }
   
-  
-
-const EnergyBarTP = () => {
+  const getIsoTimeNow = () => {
     var dt = new Date();
+    var isoTime = toIsoString(dt);
+
+    return isoTime
+  }
+
+ const getIsoTimeYesterday = () => {
     var dtYesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000))
     var isoTimeYesterday = toIsoString(dtYesterday)
-    var isoTimeNow = toIsoString(dt)
-    var isoDateToday = isoTimeNow.slice(0,10)
-    var device_id = 'x_inv_tp'
-    // var beginsWithQueryString = `${device_id}/${isoTimeNow.slice(0,10)}`
-    var beginsWithQueryString = `${device_id}/${isoDateToday}`
-    var lastDayQueryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
-    
 
-    
-    var baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
-    
-   
-    
+    return isoTimeYesterday
+ }
+
+const EnergyBarTP = () => {
+    const device_id = 'x_inv_tp'
+    const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
+
     const [chart, setChart] = useState([])
     const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
-    const [query, setQuery] = useState(beginsWithQueryString)
-    const [seconds,setSeconds] = useState(0)
-   
-    var fullURL = `${baseURL}${query}`
-
+    const [query, setQuery] = useState("Today")
+    
     const fetchData = async () => {
-        console.log("running fetch")
-        setIsError(false);
-        // setIsLoading(true);
+        var isoTimeYesterday = getIsoTimeYesterday()
+        var isoTimeNow = getIsoTimeNow()
+        var isoDateToday = isoTimeNow.slice(0,10)
+
+        if (query == "Today") {
+            var queryString = `${device_id}/${isoDateToday}`
+        } else if (query == "Last 24 Hours") {
+            var queryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
+        }
+
+        var fullURL = `${baseURL}${queryString}`
+       
         try{
-        const result = await fetch(`${fullURL}`,{mode: 'cors'})
+        const result = await fetch(fullURL)
         const json = await result.json()
         // console.log("json", json)
         setChart(json)
+        console.log(`updated energy chart at: ${isoTimeNow}`)
+        console.log(`energy chart URL: ${fullURL}`)
         } catch (error) {
-            setIsError(true);
+            console.log(error);
         }
         setIsLoading(false);
     };
@@ -93,7 +97,6 @@ const EnergyBarTP = () => {
         
         // fetchData()
         const intervalId = setInterval(() => {
-            console.log("updated energy!")
             fetchData()
         },60000)
         return () => clearInterval(intervalId)
@@ -127,15 +130,12 @@ const EnergyBarTP = () => {
     }
     var options = {
         plugins: {
-            
-        },
-        plugins: {
             legend: {
               display: false
             },  
             title:{
                 display: true,
-                text: `Energy per Trading Period ${isoDateToday}`
+                text: `Energy per Trading Period ${query}`
                 }, 
         },
         responsive: true,
@@ -166,15 +166,11 @@ const EnergyBarTP = () => {
             <Container className="mt-2">
                 <ButtonGroup size="sm" className="mb-3">
                     <Button onClick = {() => {
-                        setQuery(beginsWithQueryString)
-        
-                        console.log("fullURL",{fullURL})
+                        setQuery("Today")
                         }}>Today
                     </Button>
                     <Button onClick = {() => {
-                        setQuery(lastDayQueryString)
-                        console.log("query",{query})
-                        console.log({fullURL})
+                        setQuery("Last 24 Hours")
                         }}>Last 24 Hours
                     </Button>
                     
@@ -188,7 +184,7 @@ const EnergyBarTP = () => {
     )
 } else {
     return (
-        <h3 className='text-center'>Loading...</h3>
+        <Spinner animation="border" />
     )
 }
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Card from 'react-bootstrap/Card'
+import Spinner from 'react-bootstrap/Spinner'
 
 
 function toIsoString(date) {
@@ -61,9 +62,9 @@ const Status = () => {
             var inverterMsg = "No current errors"
         } else {
             var bgcolor = 'warning'
-            const errorCodeLink = 'Refer to Fronius error codes'
     
         }
+        
      return (
          <Card bg={bgcolor} text='white' className='mt-3 mb-3'>
             <Card.Title>&nbsp;Inverter Status: {status}</Card.Title>
@@ -72,9 +73,17 @@ const Status = () => {
             </Card.Body>
 
          </Card>
-        
-         
      )   
+    } else {
+        return (
+            <Card >
+               <Card.Title>&nbsp;Inverter Status: {status}</Card.Title>
+               <Card.Body>
+                <Spinner animation="border"/>
+               </Card.Body>
+   
+            </Card>
+        )   
     }
 
 }

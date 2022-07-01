@@ -2,6 +2,7 @@
 import React, {useState, useEffect} from 'react'
 import Card from 'react-bootstrap/Card'
 import CardGroup from 'react-bootstrap/CardGroup'
+import Spinner from 'react-bootstrap/Spinner'
 
 const totalAttribute = (attribute) => {
     var total = 0
@@ -28,40 +29,60 @@ function toIsoString(date) {
         ':' + pad(Math.abs(tzo) % 60);
   }
 
+const getIsoDateYesterday = () => {
+var dtYesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000))
+var isoTimeYesterday = toIsoString(dtYesterday)
+var isoDateYesterday = isoTimeYesterday.slice(0,10)
+
+return isoDateYesterday
+}
+
+const getIsoTimeNow = () => {
+    var dt = new Date();
+    var isoTime = toIsoString(dt);
+
+    return isoTime
+}
+
+const getIsoDateLastWeek = () => {
+    var dtLastWeek = new Date(new Date().getTime() - (24 * 60 * 60 * 1000 * 7))
+    var isoTimeLastWeek = toIsoString(dtLastWeek)
+    var isoDateLastWeek = isoTimeLastWeek.slice(0,10)
+
+    return isoDateLastWeek
+ }
+
+
 const DashCard = () => {
-    const [dayData,setDayData] = useState()
+    const [todayData,setTodayData] = useState()
     const [yesterdayData,setYesterdayData] = useState()
     const [weekData, setWeekData] = useState()
     const [billingData, setBillingData] = useState()
     const [isLoading,setIsLoading] = useState(true)
     const baseURL = 'https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/'
     const deviceID = 'x_inv_tp'
-    var dt = new Date();
-    var dtYesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000))
-    var dtLastWeek = new Date(new Date().getTime() - (24 * 60 * 60 * 1000 * 7))
-    var isoTimeYesterday = toIsoString(dtYesterday)
-    var isoTimeNow = toIsoString(dt)
-    var isoDateToday = isoTimeNow.slice(0,10)
-    var isoTimeLastWeek = toIsoString(dtLastWeek)
-    var isoStartBilling = isoDateToday.slice(0,7)
-    var isoDateYesterday = isoTimeYesterday.slice(0,10)
     
-    const weekQueryString = `${isoTimeLastWeek}/${isoTimeNow}`
-    const dayQueryString = `${isoDateToday}`
-    const billingQueryString = `${isoStartBilling}/${isoTimeNow}`
-    const yesterdayQueryString = `${isoDateYesterday}`
-
-    const fullWeekURL = `${baseURL}${deviceID}/${weekQueryString}`
-    const fullDayURL = `${baseURL}${deviceID}/${dayQueryString}`
-    const fullBillingURL = `${baseURL}${deviceID}/${billingQueryString}`
-    const fullYesterdayURL = `${baseURL}${deviceID}/${yesterdayQueryString}`
-
-
     const fetchData = async() => {
+        var isoTimeNow = getIsoTimeNow()
+        var isoDateToday = isoTimeNow.slice(0,10)
+        var isoStartBilling = isoDateToday.slice(0,7)
+        var isoDateYesterday = getIsoDateYesterday()
+        var isoDateLastWeek = getIsoDateLastWeek()
+
+        const weekQueryString = `${isoDateLastWeek}/${isoDateYesterday}`
+        const todayQueryString = `${isoDateToday}`
+        const billingQueryString = `${isoStartBilling}/${isoTimeNow}`
+        const yesterdayQueryString = `${isoDateYesterday}`
+
+        const fullWeekURL = `${baseURL}${deviceID}/${weekQueryString}`
+        const fullDayURL = `${baseURL}${deviceID}/${todayQueryString}`
+        const fullBillingURL = `${baseURL}${deviceID}/${billingQueryString}`
+        const fullYesterdayURL = `${baseURL}${deviceID}/${yesterdayQueryString}`
+
         try {
-            const dayResult = await fetch(fullDayURL)
-            const dayJson = await dayResult.json()
-            setDayData(dayJson)
+            const todayResult = await fetch(fullDayURL)
+            const todayJson = await todayResult.json()
+            setTodayData(todayJson)
 
             // console.log("yesterday URL", fullYesterdayURL)
             const yesterdayResult = await fetch(fullYesterdayURL)
@@ -73,10 +94,13 @@ const DashCard = () => {
             const weekJson = await weekResult.json()
             setWeekData(weekJson)
 
-             console.log("billing URL", fullBillingURL)
+            //  console.log("billing URL", fullBillingURL)
+        
             const billingResult = await fetch(fullBillingURL)
             const billingJson = await billingResult.json()
             setBillingData(billingJson)
+
+            console.log(`updated DashCard at ${isoTimeNow}`)
 
         } catch (error) {
             console.log(error)
@@ -86,9 +110,9 @@ const DashCard = () => {
     useEffect(() => {
         fetchData()
         const intervalId = setInterval(() => {
-            console.log("updated DashCard!")
+            
             fetchData()
-        },600000)
+        },300000)
         return () => clearInterval(intervalId)
     },[])
     
@@ -97,47 +121,48 @@ const DashCard = () => {
         // console.log("yesterday data",yesterdayData.Items)
         // console.log("billing data",billingData.Items)
 
-        const rawDayData = dayData.Items
+        const rawTodayData = todayData.Items
         
-        const dayMapRevenue = rawDayData.map(x=>x.tp_revenue)
-        const dayRevenue = totalAttribute(dayMapRevenue)
-        const totalDayRevenue = `$${dayRevenue.toFixed(2)}`
+        const todayMapRevenue = rawTodayData.map(x=>x.tp_revenue)
+        const todayRevenue = totalAttribute(todayMapRevenue)
+        var totalTodayRevenue = `$${todayRevenue.toFixed(2)}`
 
-        const dayMapEnergy = rawDayData.map(x => x.tp_energy)
-        const dayEnergy = totalAttribute(dayMapEnergy)
-        const totalDayEnergy = `${dayEnergy/1000} kWh`
+        const todayMapEnergy = rawTodayData.map(x => x.tp_energy)
+        const todayEnergy = totalAttribute(todayMapEnergy)
+        var totalTodayEnergy = `${todayEnergy/1000} kWh`
 
         const rawYesterdayData = yesterdayData.Items
 
         const yesterdayMapRevenue = rawYesterdayData.map(x=>x.tp_revenue)
         const yesterdayRevenue = totalAttribute(yesterdayMapRevenue)
-        const totalYesterdayRevenue = `$${yesterdayRevenue.toFixed(2)}`
+        var totalYesterdayRevenue = `$${yesterdayRevenue.toFixed(2)}`
 
         const yesterdayMapEnergy = rawYesterdayData.map(x => x.tp_energy)
         const yesterdayEnergy = totalAttribute(yesterdayMapEnergy)
-        const totalYesterdayEnergy = `${yesterdayEnergy/1000} kWh`
+        var totalYesterdayEnergy = `${yesterdayEnergy/1000} kWh`
 
         const rawWeekData = weekData.Items
 
         const weekMapRevenue = rawWeekData.map(x=>x.tp_revenue)
         const weekRevenue = totalAttribute(weekMapRevenue)
-        const totalWeekRevenue = `$${weekRevenue.toFixed(2)}`
+        var totalWeekRevenue = `$${weekRevenue.toFixed(2)}`
 
         const weekMapEnergy = rawWeekData.map(x => x.tp_energy)
         const weekEnergy = totalAttribute(weekMapEnergy)
-        const totalWeekEnergy = `${weekEnergy/1000} kWh`
+        var totalWeekEnergy = `${weekEnergy/1000} kWh`
 
         const rawBillingData = billingData.Items
 
         const billingMapRevenue = rawBillingData.map(x=>x.tp_revenue)
         const billingRevenue = totalAttribute(billingMapRevenue)
-        const totalBillingRevenue = `$${billingRevenue.toFixed(2)}`
+        var totalBillingRevenue = `$${billingRevenue.toFixed(2)}`
 
         const billingMapEnergy = rawBillingData.map(x => x.tp_energy)
         const billingEnergy = totalAttribute(billingMapEnergy)
-        const totalBillingEnergy = `${billingEnergy/1000} kWh`
+        var totalBillingEnergy = `${billingEnergy/1000} kWh`
 
-
+    } 
+    
     return(
         <div>     
             <CardGroup>
@@ -145,29 +170,29 @@ const DashCard = () => {
                     <Card.Title className='mt-2'>&nbsp;Total Energy</Card.Title>
                     <Card.Body>
                         <ul>
-                            <li>Today: {totalDayEnergy}</li>
-                            <li>Yesterday: {totalYesterdayEnergy}</li>
-                            <li>Last 7 days: {totalWeekEnergy}</li>
-                            <li>This billing period (calendar month): {totalBillingEnergy}</li>
+                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : totalTodayEnergy}</li>
+                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : totalYesterdayEnergy}</li>
+                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : totalWeekEnergy}</li>
+                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : totalBillingEnergy}</li>
                         </ul>
                     </Card.Body>
                 </Card>
         
                 <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Total Revenue:</Card.Title>
+                    <Card.Title className='mt-2'>&nbsp;Total Revenue</Card.Title>
                     <Card.Body>
                         <ul>
-                            <li>Today: {totalDayRevenue}</li>
-                            <li>Yesterday: {totalYesterdayRevenue}</li>
-                            <li>Last 7 days: {totalWeekRevenue}</li>
-                            <li>This billing period (calendar month): {totalBillingRevenue}</li>
+                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : totalTodayRevenue}</li>
+                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : totalYesterdayRevenue}</li>
+                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : totalWeekRevenue}</li>
+                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : totalBillingRevenue}</li>
                         </ul>
                     </Card.Body>
                 </Card>
             </CardGroup>
         </div>
     )
-    }
+    
 }
 
 export default DashCard
