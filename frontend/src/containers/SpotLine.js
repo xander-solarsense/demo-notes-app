@@ -55,7 +55,7 @@ function toIsoString(date) {
   }
   
 const SpotLine = () => {
-    const device_id = 'x_inv_tp'
+    const device_id = 'x_inv_tp_sp_only'
     
     const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
     

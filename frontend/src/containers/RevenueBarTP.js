@@ -112,7 +112,7 @@ export default function RevenueBarTP() {
             lineTension: 0.3,
             pointRadius: 1,
             label: `Revenue`,
-            data: chart.Items.map(x => (x.tp_revenue).toFixed(2)),
+            data: chart.Items.map(x => (x.tp_revenue).toFixed(4)),
             backgroundColor: [
                 'rgba(0,128,0,0.8'
             ],
