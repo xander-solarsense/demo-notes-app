@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { Chart as ChartJS, LineElement, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
-import {Bar} from 'react-chartjs-2'
+import {Chart} from 'react-chartjs-2'
 import Container from 'react-bootstrap/Container'
 import 'date-fns'
 import 'chartjs-adapter-date-fns'
@@ -59,12 +59,15 @@ function toIsoString(date) {
  }
 
 const EnergyBarTP = () => {
-    const device_id = 'x_inv_tp'
+    const inv_device_id = 'x_inv_tp'
     const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
+
+    const sol_device_id = 'x_inv_solcast'
 
     const [chart, setChart] = useState([])
     const [isLoading, setIsLoading] = useState(true);
     const [query, setQuery] = useState("Today")
+    const [estimate, setEstimate] = useState([])
     
     const fetchData = async () => {
         var isoTimeYesterday = getIsoTimeYesterday()
@@ -72,20 +75,30 @@ const EnergyBarTP = () => {
         var isoDateToday = isoTimeNow.slice(0,10)
 
         if (query == "Today") {
-            var queryString = `${device_id}/${isoDateToday}`
+            var invQueryString = `${inv_device_id}/${isoDateToday}`
+            var solQueryString = `${sol_device_id}/${isoDateToday}`
         } else if (query == "Last 24 Hours") {
-            var queryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
+            var invQueryString = `${inv_device_id}/${isoTimeYesterday}/${isoTimeNow}`
+            var solQueryString = `${sol_device_id}/${isoTimeYesterday}/${isoTimeNow}`
         }
 
-        var fullURL = `${baseURL}${queryString}`
+        var invFullURL = `${baseURL}${invQueryString}`
+        var solFullURL = `${baseURL}${solQueryString}`
        
         try{
-        const result = await fetch(fullURL)
-        const json = await result.json()
-        // console.log("json", json)
-        setChart(json)
+        const invResult = await fetch(invFullURL)
+        const invJson = await invResult.json()
+        setChart(invJson)
         console.log(`updated energy chart at: ${isoTimeNow}`)
-        console.log(`energy chart URL: ${fullURL}`)
+        console.log(`energy chart URL: ${invFullURL}`)
+
+        const solResult = await fetch(solFullURL)
+        const solJson = await solResult.json()
+        setEstimate(solJson)
+
+        console.log(`updated energy chart at: ${isoTimeNow}`)
+        console.log(`energy chart URL: ${invFullURL}`)
+        
         } catch (error) {
             console.log(error);
         }
@@ -106,16 +119,43 @@ const EnergyBarTP = () => {
 
     if (! isLoading) {
     
-    console.log("Energy bar data", chart)
+    
+
+    let invData = chart.Items
+    let solData = estimate.Items
+
+    const combinedData = solData.map(x => ({...x, ...invData.find(tp => tp.trading_period === x.trading_period)}) )
+    console.log("Energy bar data", combinedData)
+    console.log("PV estimate data", combinedData.map(x => x.pv_estimate))
+
     var data = {
-        labels: chart.Items.map(x => x.trading_period),
+        labels: combinedData.map(x => x.trading_period),
         datasets: [{
+            type: 'line',
+            label: `Estimated Energy`,
+            data: combinedData.map(x => x.pv_estimate),
+            backgroundColor: [
+                'green',
+            ],
+            borderColor: [
+                'green',
+            ],
+            borderWidth: [
+                2
+            ],
+            borderDash: [
+                8,10
+            ],
+            pointRadius: 0,
+        },
+        {
+            type: 'bar',
             lineTension: 0.3,
             pointRadius: 1,
-            label: `Energy`,
-            data: chart.Items.map(x => (x.tp_energy).toFixed(2)),
+            label: `Actual Energy`,
+            data: combinedData.map(x => x.tp_energy),
             backgroundColor: [
-                'orange'
+                'orange',
             ],
             borderColor: [
                 'orange',
@@ -126,17 +166,21 @@ const EnergyBarTP = () => {
               },
             borderRadius: 3
 
-        }]
+        },
+    ]
     }
     var options = {
         plugins: {
             legend: {
-              display: false
+              display: true
             },  
             title:{
                 display: true,
                 text: `Energy per Trading Period ${query}`
                 }, 
+            datalabels: {
+                display: false
+            },
         },
         responsive: true,
         interaction: {
@@ -175,7 +219,8 @@ const EnergyBarTP = () => {
                     </Button>
                     
                 </ButtonGroup>
-                <Bar
+                <Chart
+                type = 'bar'
                 data = {data}
                 options = {options}
                 />
