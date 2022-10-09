@@ -9,6 +9,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import Spinner from 'react-bootstrap/Spinner'
 
+const siteName = "te_anga"
 
 
 
@@ -59,10 +60,10 @@ function toIsoString(date) {
  }
 
 const EnergyBarTP = () => {
-    const inv_device_id = 'x_inv_tp'
+    const inv_device_id = `${siteName}_tp`
     const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
 
-    const sol_device_id = 'x_inv_solcast'
+    const sol_device_id = `${siteName}_solcast`
 
     const [chart, setChart] = useState([])
     const [isLoading, setIsLoading] = useState(true);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Card from 'react-bootstrap/Card'
 import Spinner from 'react-bootstrap/Spinner'
 
+const siteName = "te_anga"
 
 function toIsoString(date) {
     var tzo = -date.getTimezoneOffset(),
@@ -27,7 +28,7 @@ const Status = () => {
     var dt = new Date();
     var isoTimeNow = toIsoString(dt)
     var isoDateToday = isoTimeNow.slice(0,10)
-    var device_id = 'x_inv_2s'
+    var device_id = `${siteName}_2s`
     var limitQueryString = `${device_id}/${isoDateToday}/limit/1`
     var baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
     var fullURL = `${baseURL}${limitQueryString}`

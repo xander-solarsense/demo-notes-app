@@ -2,11 +2,15 @@ import React from 'react'
 import ReactWeather, { useOpenWeather } from 'react-open-weather';
 import Container from 'react-bootstrap/Container'
 
+const siteName = "Te Anga"
+const siteLat = '-38.27866'
+const siteLong = '174.98628'
+
 const Weather = () => {
   const { data, isLoading, errorMessage } = useOpenWeather({
     key: 'a13c811babaa5866bf49af251cf8e390',
-    lat: '-37.91535',
-    lon: '175.30397',
+    lat: siteLat,
+    lon: siteLong,
     lang: 'en',
     unit: 'metric', // values are (metric, standard, imperial)
   });
@@ -18,7 +22,7 @@ const Weather = () => {
       errorMessage={errorMessage}
       data={data}
       lang="en"
-      locationLabel="Ohaupo"
+      locationLabel={siteName}
       unitsLabels={{ temperature: 'C', windSpeed: 'Km/h' }}
       showForecast={false}
     />

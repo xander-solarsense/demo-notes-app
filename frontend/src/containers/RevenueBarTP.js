@@ -9,10 +9,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import Spinner from 'react-bootstrap/Spinner'
 
-
-
-
-
+const siteName = "te_anga"
 
 ChartJS.register(
     PointElement,
@@ -59,7 +56,7 @@ function toIsoString(date) {
 
 export default function RevenueBarTP() {
 
-    const device_id = 'x_inv_tp'
+    const device_id = `${siteName}_tp`
     const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
     
     const [chart, setChart] = useState([])
@@ -111,8 +108,8 @@ export default function RevenueBarTP() {
         datasets: [{
             lineTension: 0.3,
             pointRadius: 1,
-            label: `Revenue`,
-            data: chart.Items.map(x => (x.tp_revenue).toFixed(4)),
+            label: `Spot Revenue`,
+            data: chart.Items.map(x => (x.tp_spot_revenue).toFixed(4)),
             backgroundColor: [
                 'rgba(0,128,0,0.8'
             ],
@@ -125,12 +122,30 @@ export default function RevenueBarTP() {
               },
             borderRadius: 3
 
-        }]
+        },
+        {
+            lineTension: 0.3,
+            pointRadius: 1,
+            label: `Fixed Revenue`,
+            data: chart.Items.map(x => (x.tp_fixed_revenue).toFixed(4)),
+            backgroundColor: [
+                'rgb(53, 162, 235)'
+            ],
+            borderColor: [
+                'blue',
+            ],
+            borderWidth: 0,
+            datalabels: {
+                display: false
+              },
+            borderRadius: 3
+        }
+    ]
     }
     var options = {
         plugins: {
             legend: {
-              display: false
+              display: true
             },  
             title:{
                 display: true,

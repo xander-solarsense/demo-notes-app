@@ -31,10 +31,10 @@ const Dashboard = () => {
         <div>
           <Container>
             <Row lg={2}>
-              <Col lg={8}>
+              <Col lg={9}>
                 <DashCard/>
               </Col>
-              <Col lg={4}>
+              <Col lg={3}>
                 <Status/>
               </Col>
             </Row>

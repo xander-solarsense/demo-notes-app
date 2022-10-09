@@ -4,6 +4,8 @@ import Card from 'react-bootstrap/Card'
 import CardGroup from 'react-bootstrap/CardGroup'
 import Spinner from 'react-bootstrap/Spinner'
 
+const siteName = "te_anga"
+
 const totalAttribute = (attribute) => {
     var total = 0
     for (var i = 0; i < attribute.length; i++) {
@@ -60,7 +62,7 @@ const DashCard = () => {
     const [billingData, setBillingData] = useState()
     const [isLoading,setIsLoading] = useState(true)
     const baseURL = 'https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/'
-    const deviceID = 'x_inv_tp'
+    const deviceID = `${siteName}_tp`
     
     const fetchData = async() => {
         var isoTimeNow = getIsoTimeNow()
@@ -123,9 +125,13 @@ const DashCard = () => {
 
         const rawTodayData = todayData.Items
         
-        const todayMapRevenue = rawTodayData.map(x=>x.tp_revenue)
-        const todayRevenue = totalAttribute(todayMapRevenue)
-        var totalTodayRevenue = `$${todayRevenue.toFixed(2)}`
+        const todaySpotMapRevenue = rawTodayData.map(x=>x.tp_spot_revenue)
+        const todaySpotRevenue = totalAttribute(todaySpotMapRevenue)
+        var totalTodaySpotRevenue = `$${todaySpotRevenue.toFixed(2)}`
+
+        const todayFixedMapRevenue = rawTodayData.map(x=>x.tp_fixed_revenue)
+        const todayFixedRevenue = totalAttribute(todayFixedMapRevenue)
+        var totalTodayFixedRevenue = `$${todayFixedRevenue.toFixed(2)}`
 
         const todayMapEnergy = rawTodayData.map(x => x.tp_energy)
         const todayEnergy = totalAttribute(todayMapEnergy)
@@ -133,9 +139,13 @@ const DashCard = () => {
 
         const rawYesterdayData = yesterdayData.Items
 
-        const yesterdayMapRevenue = rawYesterdayData.map(x=>x.tp_revenue)
-        const yesterdayRevenue = totalAttribute(yesterdayMapRevenue)
-        var totalYesterdayRevenue = `$${yesterdayRevenue.toFixed(2)}`
+        const yesterdaySpotMapRevenue = rawYesterdayData.map(x=>x.tp_spot_revenue)
+        const yesterdaySpotRevenue = totalAttribute(yesterdaySpotMapRevenue)
+        var totalYesterdaySpotRevenue = `$${yesterdaySpotRevenue.toFixed(2)}`
+
+        const yesterdayFixedMapRevenue = rawYesterdayData.map(x=>x.tp_fixed_revenue)
+        const yesterdayFixedRevenue = totalAttribute(yesterdayFixedMapRevenue)
+        var totalYesterdayFixedRevenue = `$${yesterdayFixedRevenue.toFixed(2)}`
 
         const yesterdayMapEnergy = rawYesterdayData.map(x => x.tp_energy)
         const yesterdayEnergy = totalAttribute(yesterdayMapEnergy)
@@ -143,9 +153,13 @@ const DashCard = () => {
 
         const rawWeekData = weekData.Items
 
-        const weekMapRevenue = rawWeekData.map(x=>x.tp_revenue)
-        const weekRevenue = totalAttribute(weekMapRevenue)
-        var totalWeekRevenue = `$${weekRevenue.toFixed(2)}`
+        const weekSpotMapRevenue = rawWeekData.map(x=>x.tp_spot_revenue)
+        const weekSpotRevenue = totalAttribute(weekSpotMapRevenue)
+        var totalWeekSpotRevenue = `$${weekSpotRevenue.toFixed(2)}`
+
+        const weekFixedMapRevenue = rawWeekData.map(x=>x.tp_spot_revenue)
+        const weekFixedRevenue = totalAttribute(weekFixedMapRevenue)
+        var totalWeekFixedRevenue = `$${weekFixedRevenue.toFixed(2)}`
 
         const weekMapEnergy = rawWeekData.map(x => x.tp_energy)
         const weekEnergy = totalAttribute(weekMapEnergy)
@@ -153,9 +167,13 @@ const DashCard = () => {
 
         const rawBillingData = billingData.Items
 
-        const billingMapRevenue = rawBillingData.map(x=>x.tp_revenue)
-        const billingRevenue = totalAttribute(billingMapRevenue)
-        var totalBillingRevenue = `$${billingRevenue.toFixed(2)}`
+        const billingSpotMapRevenue = rawBillingData.map(x=>x.tp_spot_revenue)
+        const billingSpotRevenue = totalAttribute(billingSpotMapRevenue)
+        var totalBillingSpotRevenue = `$${billingSpotRevenue.toFixed(2)}`
+
+        const billingFixedMapRevenue = rawBillingData.map(x=>x.tp_fixed_revenue)
+        const billingFixedRevenue = totalAttribute(billingFixedMapRevenue)
+        var totalBillingFixedRevenue = `$${billingFixedRevenue.toFixed(2)}`
 
         const billingMapEnergy = rawBillingData.map(x => x.tp_energy)
         const billingEnergy = totalAttribute(billingMapEnergy)
@@ -179,13 +197,24 @@ const DashCard = () => {
                 </Card>
         
                 <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Total Revenue</Card.Title>
+                    <Card.Title className='mt-2'>&nbsp;Total Revenue: Spot Price</Card.Title>
                     <Card.Body>
                         <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : totalTodayRevenue}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : totalYesterdayRevenue}</li>
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : totalWeekRevenue}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : totalBillingRevenue}</li>
+                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : totalTodaySpotRevenue}</li>
+                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : totalYesterdaySpotRevenue}</li>
+                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : totalWeekSpotRevenue}</li>
+                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : totalBillingSpotRevenue}</li>
+                        </ul>
+                    </Card.Body>
+                </Card>
+                <Card className='mb-3 mt-3'>
+                    <Card.Title className='mt-2'>&nbsp;Total Revenue: Fixed Price</Card.Title>
+                    <Card.Body>
+                        <ul>
+                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : totalTodayFixedRevenue}</li>
+                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : totalYesterdayFixedRevenue}</li>
+                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : totalWeekFixedRevenue}</li>
+                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : totalBillingFixedRevenue}</li>
                         </ul>
                     </Card.Body>
                 </Card>

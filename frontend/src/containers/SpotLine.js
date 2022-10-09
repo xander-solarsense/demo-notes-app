@@ -9,6 +9,8 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import Spinner from 'react-bootstrap/Spinner'
 
+const siteGXP = "HTI0331"
+
 ChartJS.register(
     LineElement,
     PointElement,
@@ -55,7 +57,7 @@ function toIsoString(date) {
   }
   
 const SpotLine = () => {
-    const device_id = 'spot_price_HLY0331'
+    const device_id = `spot_price_${siteGXP}`
     
     const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
     
@@ -131,7 +133,7 @@ const SpotLine = () => {
             },  
             title:{
                 display: true,
-                text: `Spot Price HLY0331 per MWh ${query}`
+                text: `Spot Price ${siteGXP} per MWh ${query}`
                 }, 
         },
         responsive: true,

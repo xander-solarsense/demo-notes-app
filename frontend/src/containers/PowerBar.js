@@ -6,6 +6,8 @@ import 'chartjs-adapter-date-fns'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import Spinner from 'react-bootstrap/Spinner'
 
+const siteName = "te_anga"
+const siteMaxPower = 15840
 
 ChartJS.register(
     BarElement,
@@ -42,7 +44,7 @@ const getIsoTimeNow = () => {
 }
 
 const PowerBar = () => {
-    const device_id = 'x_inv_2s'
+    const device_id = `${siteName}_2s`
     
     const [chart, setChart] = useState([])
     const [isLoading, setIsLoading] = useState(true);
@@ -83,12 +85,8 @@ const PowerBar = () => {
     if (! isLoading) {
 
     const current_pwr = chart.Items.map(x => x.current_pwr)
-    const pwr_percent = Math.round((current_pwr/5000)*100)
-    const randMulti1 = (Math.random()/10)+1
-    const randMulti2 = (Math.random()/10)+1
-    const fakeData1 = Math.floor(randMulti1*current_pwr)
-    const fakeData2 = Math.floor(randMulti2*current_pwr)
-    const labels = [[`${pwr_percent} %`,"Phase 1"],[`${Math.round((fakeData1/5000)*100)} %`,"Phase 2"],[`${Math.round((fakeData2/5000)*100)} %`,"Phase 3"]]
+    const pwr_percent = Math.round((current_pwr/siteMaxPower)*100)
+    const labels = [`${pwr_percent} %`]
     
     if (pwr_percent > 60) {
         var barColor = 'green'
@@ -102,7 +100,7 @@ const PowerBar = () => {
         datasets: [
         {
           label: 'Phase Data',
-          data: [current_pwr, fakeData1, fakeData2],
+          data: [current_pwr],
           datalabels: {
               formatter: (val) => {
                 return val + ' Wh'
@@ -110,25 +108,25 @@ const PowerBar = () => {
               color: 'white'
             },
           backgroundColor: barColor,
-          barPercentage: .9,
-          categoryPercentage: .9,
+          barPercentage: .7,
+          categoryPercentage: .7,
           borderSkipped: 'bottom',
           
           },
           
           {
             labels: 'Phase Top',
-            data: [5000-current_pwr, 5000-fakeData1, 5000-fakeData2],
+            data: [siteMaxPower-current_pwr],
             backgroundColor: ['transparent'],
             borderColor: barColor,
             borderWidth: 2,
             borderRadius: 5,
-            borderSkipped: ['bottom','bottom','bottom'],
+            borderSkipped: ['bottom'],
             datalabels: {
               display: false
             },
-            barPercentage: .9,
-            categoryPercentage: .9,
+            barPercentage: .7,
+            categoryPercentage: .7,
           },
         ],
       };
@@ -139,7 +137,7 @@ const PowerBar = () => {
         },
         title: {
           display: true,
-          text: ['  Power', '  Max 5000 Wh per Phase'],
+          text: ['  Power', '  Max 15840 Wh'],
         },
       },
       responsive: true,
@@ -168,7 +166,7 @@ const PowerBar = () => {
       
     }
     return (
-      <div style={{height:300, width:190}}>
+      <div style={{height:340, width:120}}>
         <Bar 
         data = {data}
         options = {options}
