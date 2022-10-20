@@ -58,12 +58,25 @@ function toIsoString(date) {
 
     return isoTimeYesterday
  }
+ const getIsoTimeLastWeek = () => {
+    var dtLastWeek = new Date(new Date().getTime() - (24 * 60 * 60 * 7 * 1000))
+    var isoTimeLastWeek = toIsoString(dtLastWeek)
+
+    return isoTimeLastWeek
+ }
+ const getIsoTimeLast30 = () => {
+    var dtLast30 = new Date(new Date().getTime() - (24 * 60 * 60 * 30 * 1000))
+    var isoTimeLast30 = toIsoString(dtLast30)
+
+    return isoTimeLast30
+ }
 
 const EnergyBarTP = () => {
-    const inv_device_id = `${siteName}_tp`
+    const inv_device_id_tp= `${siteName}_tp`
+    const inv_device_id_day = `${siteName}_day`
     const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
 
-    const sol_device_id = `${siteName}_solcast`
+    const sol_device_id_tp = `${siteName}_solcast`
 
     const [chart, setChart] = useState([])
     const [isLoading, setIsLoading] = useState(true);
@@ -74,13 +87,22 @@ const EnergyBarTP = () => {
         var isoTimeYesterday = getIsoTimeYesterday()
         var isoTimeNow = getIsoTimeNow()
         var isoDateToday = isoTimeNow.slice(0,10)
+        var isoTimeLastWeek = getIsoTimeLastWeek()
+        var isoTimeLast30 = getIsoTimeLast30()
+       
 
         if (query == "Today") {
-            var invQueryString = `${inv_device_id}/${isoDateToday}`
-            var solQueryString = `${sol_device_id}/${isoDateToday}`
+            var invQueryString = `${inv_device_id_tp}/${isoDateToday}`
+            var solQueryString = `${sol_device_id_tp}/${isoDateToday}`
         } else if (query == "Last 24 Hours") {
-            var invQueryString = `${inv_device_id}/${isoTimeYesterday}/${isoTimeNow}`
-            var solQueryString = `${sol_device_id}/${isoTimeYesterday}/${isoTimeNow}`
+            var invQueryString = `${inv_device_id_tp}/${isoTimeYesterday}/${isoTimeNow}`
+            var solQueryString = `${sol_device_id_tp}/${isoTimeYesterday}/${isoTimeNow}`
+        } else if (query == "Last 7 Days") {
+            var invQueryString = `${inv_device_id_day}/${isoTimeLastWeek}/${isoTimeNow}`
+            var solQueryString = `${sol_device_id_tp}/${isoTimeLastWeek}/${isoTimeNow}`
+        } else if (query == "Last 30 Days") {
+            var invQueryString = `${inv_device_id_day}/${isoTimeLast30}/${isoTimeNow}`
+            var solQueryString = `${sol_device_id_tp}/${isoTimeLastWeek}/${isoTimeNow}`
         }
 
         var invFullURL = `${baseURL}${invQueryString}`
@@ -119,7 +141,7 @@ const EnergyBarTP = () => {
     
 
     if (! isLoading) {
-    
+    if (query == "Today" | query == "Last 24 Hours"){
     
 
     let invData = chart.Items
@@ -148,7 +170,8 @@ const EnergyBarTP = () => {
                 8,10
             ],
             pointRadius: 0,
-        },
+        }
+        ,
         {
             type: 'bar',
             lineTension: 0.3,
@@ -169,15 +192,77 @@ const EnergyBarTP = () => {
 
         },
     ]
+}
+var options = {
+    plugins: {
+        legend: {
+          display: true
+        },  
+        title:{
+            display: true,
+            text: `Energy per Trading Period ${query}`
+            }, 
+        datalabels: {
+            display: false
+        },
+    },
+    responsive: true,
+    interaction: {
+        mode: 'index',
+        intersect: false
+    },
+    
+    scales: {
+        x: {
+            // type: 'time',
+            title: {
+                display: true,
+                text: 'Trading Period'
+            }
+        },
+        y: {
+            title: {
+                display: true,
+                text: 'Power in Wh'
+            },
+            min: 0
+        }
+     }
+}
+    } else if (query == "Last 7 Days" | query == "Last 30 Days") {
+        let invData = chart.Items
+
+    var data = {
+        labels: invData.map(x => x.date),
+        datasets: [{
+            type: 'bar',
+            lineTension: 0.3,
+            pointRadius: 1,
+            label: `Actual Energy`,
+            data: invData.map(x => x.day_total_energy/1000),
+            backgroundColor: [
+                'orange',
+            ],
+            borderColor: [
+                'orange',
+            ],
+            borderWidth: 0,
+            datalabels: {
+                display: false
+              },
+            borderRadius: 3
+
+        },
+    ]
     }
     var options = {
         plugins: {
             legend: {
-              display: true
+              display: false
             },  
             title:{
                 display: true,
-                text: `Energy per Trading Period ${query}`
+                text: `Energy per Day ${query}`
                 }, 
             datalabels: {
                 display: false
@@ -191,21 +276,25 @@ const EnergyBarTP = () => {
         
         scales: {
             x: {
-                // type: 'time',
+                type: 'time',
+                time: {
+                    unit: 'day',
+                    
+                },
                 title: {
                     display: true,
-                    text: 'Trading Period'
+                    text: 'Date'
                 }
             },
             y: {
                 title: {
                     display: true,
-                    text: 'Power in Wh'
+                    text: 'Power in kWh'
                 },
                 min: 0
             }
          }
-    }
+    }}
     return (
         <div>
             <Container className="mt-2">
@@ -217,6 +306,14 @@ const EnergyBarTP = () => {
                     <Button onClick = {() => {
                         setQuery("Last 24 Hours")
                         }}>Last 24 Hours
+                    </Button>
+                    <Button onClick = {() => {
+                        setQuery("Last 7 Days")
+                        }}>Last 7 Days
+                    </Button>
+                    <Button onClick = {() => {
+                        setQuery("Last 30 Days")
+                        }}>Last 30 Days
                     </Button>
                     
                 </ButtonGroup>

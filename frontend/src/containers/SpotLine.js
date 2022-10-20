@@ -48,6 +48,13 @@ function toIsoString(date) {
 
     return isoTimeYesterday
  }
+
+ const getIsoTimeLastWeek = () => {
+    var dtLastWeek = new Date(new Date().getTime() - (24 * 7 * 60 * 60 * 1000))
+    var isoTimeLastWeek = toIsoString(dtLastWeek)
+
+    return isoTimeLastWeek
+ }
   
  const getIsoTimeNow = () => {
     var dt = new Date();
@@ -69,11 +76,14 @@ const SpotLine = () => {
         var isoTimeYesterday = getIsoTimeYesterday()
         var isoTimeNow = getIsoTimeNow()
         var isoDateToday = isoTimeNow.slice(0,10)
+        var isoTimeLastWeek = getIsoTimeLastWeek()
         
         if (query == "Today") {
             var queryString = `${device_id}/${isoDateToday}`
         } else if (query == "Last 24 Hours") {
             var queryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
+        } else if (query == "Last 7 Days") {
+            var queryString = `${device_id}/${isoTimeLastWeek}/${isoTimeNow}`
         }
 
         var fullURL = `${baseURL}${queryString}`
@@ -171,6 +181,11 @@ const SpotLine = () => {
                         setQuery("Last 24 Hours")
                         console.log("query",{query})
                         }}>Last 24 Hours
+                    </Button>
+                    <Button onClick = {() => {
+                        setQuery("Last 7 Days")
+                        console.log("query",{query})
+                        }}>Last 7 Days
                     </Button>
                     
                 </ButtonGroup>
