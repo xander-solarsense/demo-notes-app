@@ -157,7 +157,7 @@ const DashCard = () => {
         const weekSpotRevenue = totalAttribute(weekSpotMapRevenue)
         var totalWeekSpotRevenue = `$${weekSpotRevenue.toFixed(2)}`
 
-        const weekFixedMapRevenue = rawWeekData.map(x=>x.tp_spot_revenue)
+        const weekFixedMapRevenue = rawWeekData.map(x=>x.tp_fixed_revenue)
         const weekFixedRevenue = totalAttribute(weekFixedMapRevenue)
         var totalWeekFixedRevenue = `$${weekFixedRevenue.toFixed(2)}`
 
