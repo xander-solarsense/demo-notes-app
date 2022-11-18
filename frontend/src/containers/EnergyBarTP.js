@@ -72,7 +72,7 @@ function toIsoString(date) {
  }
 
 const EnergyBarTP = () => {
-    const inv_device_id_tp= `${siteName}_tp`
+    const inv_device_id_tp= `${siteName}_tp_energy`
     const inv_device_id_day = `${siteName}_day`
     const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
 
@@ -114,6 +114,7 @@ const EnergyBarTP = () => {
         setChart(invJson)
         console.log(`updated energy chart at: ${isoTimeNow}`)
         console.log(`energy chart URL: ${invFullURL}`)
+        console.log('energy chart data: ',invJson)
 
         const solResult = await fetch(solFullURL)
         const solJson = await solResult.json()
@@ -145,9 +146,10 @@ const EnergyBarTP = () => {
     
 
     let invData = chart.Items
+    console.log("inv data: ", invData)
     let solData = estimate.Items
 
-    const combinedData = solData.map(x => ({...x, ...invData.find(tp => tp.trading_period === x.trading_period)}) )
+    const combinedData = solData.map(x => ({...x, ...invData.find(tp_energy => tp_energy.trading_period === x.trading_period)}) )
     console.log("Energy bar data", combinedData)
     console.log("PV estimate data", combinedData.map(x => x.pv_estimate))
 
