@@ -104,6 +104,10 @@ const Errors = () => {
         
         return (
             <div >
+                <Card className='mb-3 mt-3'>
+                <Card.Title>
+                    Inverter Errors <a href="https://www.fallonsolutions.com.au/solar/information/fronius-inverter-error-codes">Refer to Fronius error codes</a>
+                </Card.Title>
                 <ButtonGroup size="sm" className="mb-3">
                     <Button onClick = {() => {
                         setQuery("Today")
@@ -140,7 +144,7 @@ const Errors = () => {
                     ))}
                 </tbody>
                 </Table>
-                
+                </Card>
             </div>
         )   
     } else {

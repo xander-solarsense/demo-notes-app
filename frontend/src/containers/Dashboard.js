@@ -67,14 +67,11 @@ const Dashboard = () => {
               </Col>
             </Row>
             <Row>
-            <Card className='mb-3 mt-3'>
-                <Card.Title>
-                    Inverter Errors
-                </Card.Title>
-                <Card.Body>
+            
+              
               <Errors/>
-              </Card.Body>
-            </Card>
+            
+            
             </Row>
           </Container>
         </div>
