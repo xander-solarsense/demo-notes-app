@@ -17,6 +17,7 @@ import { onError } from "./lib/errorLib";
 import Dashboard from './containers/Dashboard'
 import "./App.css"
 import Test from './containers/Test'
+import Errors from "./containers/Errors";
 
 export default function App() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -89,6 +90,7 @@ async function handleLogout() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={isAuthenticated ? <Signup /> : <Login />}/>
           <Route path="dashboard" element={<Dashboard/>} />
+          <Route path="errors" element={<Errors/>} />
           {/* <Route path="test" element={<Test/>} /> */}
           <Route path="*" element={<NotFound />}/>
         </Routes>

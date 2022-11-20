@@ -11,6 +11,7 @@ import Weather from './Weather'
 import SpotLine from './SpotLine'
 import Card from 'react-bootstrap/Card'
 import DashCard from './DashCard'
+import Errors from './Errors'
 
 import Status from './Status'
 
@@ -64,6 +65,16 @@ const Dashboard = () => {
                   <SpotLine />
                 </Card>
               </Col>
+            </Row>
+            <Row>
+            <Card className='mb-3 mt-3'>
+                <Card.Title>
+                    Inverter Errors
+                </Card.Title>
+                <Card.Body>
+              <Errors/>
+              </Card.Body>
+            </Card>
             </Row>
           </Container>
         </div>
