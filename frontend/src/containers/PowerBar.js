@@ -85,8 +85,14 @@ const PowerBar = () => {
     if (! isLoading) {
 
     const current_pwr = chart.Items.map(x => x.current_pwr)
+    // const current_pwr = 1700
     const pwr_percent = Math.round((current_pwr/siteMaxPower)*100)
     const labels = [`${pwr_percent} %`]
+    if (current_pwr >= siteMaxPower) {
+      var powerTop = 0
+    } else if (current_pwr < siteMaxPower) {
+      var powerTop = siteMaxPower - current_pwr
+    }
     
     if (pwr_percent > 60) {
         var barColor = 'green'
@@ -110,13 +116,13 @@ const PowerBar = () => {
           backgroundColor: barColor,
           barPercentage: .7,
           categoryPercentage: .7,
-          borderSkipped: 'bottom',
-          
+          borderSkipped: ['bottom'],
+        
           },
           
           {
             labels: 'Phase Top',
-            data: [siteMaxPower-current_pwr],
+            data: [powerTop],
             backgroundColor: ['transparent'],
             borderColor: barColor,
             borderWidth: 2,

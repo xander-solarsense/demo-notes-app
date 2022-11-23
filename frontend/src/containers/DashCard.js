@@ -14,6 +14,12 @@ const totalAttribute = (attribute) => {
     return total
 }
 
+const wattsToKWH = (watts) => {
+    var KWH = Math.round(watts/100)/10
+
+    return KWH
+}
+
 function toIsoString(date) {
     var tzo = -date.getTimezoneOffset(),
         dif = tzo >= 0 ? '+' : '-',
@@ -61,11 +67,14 @@ const DashCard = () => {
     const [yesterdayData,setYesterdayData] = useState()
     const [yesterdayEnergyData,setYesterdayEnergyData] = useState()
     const [weekData, setWeekData] = useState()
+    const [weekEnergyData, setWeekEnergyData] = useState()
     const [billingData, setBillingData] = useState()
+    const [billingEnergyData, setBillingEnergyData] = useState()
     const [todaySolcastData, setTodaySolcastData] = useState()
     const [isLoading,setIsLoading] = useState(true)
     const baseURL = 'https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/'
     const deviceID = `${siteName}_tp`
+    const dayDataDeviceID = `${siteName}_day`
     const solcastDeviceID = `${siteName}_solcast`
     
     const fetchData = async() => {
@@ -81,11 +90,13 @@ const DashCard = () => {
         const yesterdayQueryString = `${isoDateYesterday}`
 
         const fullWeekURL = `${baseURL}${deviceID}/${weekQueryString}`
+        const fullWeekEnergyURL = `${baseURL}${dayDataDeviceID}/${weekQueryString}`
         const fullDayURL = `${baseURL}${deviceID}/${todayQueryString}`
         const fullDayEnergyURL = `${baseURL}${siteName}_2s/${todayQueryString}/limit/1`
         const fullBillingURL = `${baseURL}${deviceID}/${billingQueryString}`
+        const fullBillingEnergyURL = `${baseURL}${dayDataDeviceID}/${billingQueryString}`
         const fullYesterdayURL = `${baseURL}${deviceID}/${yesterdayQueryString}`
-        const fullYesterdayEnergyURL = `${baseURL}${siteName}_1/${yesterdayQueryString}/limit/1`
+        const fullYesterdayEnergyURL = `${baseURL}${dayDataDeviceID}/${yesterdayQueryString}`
         const fullTodaySolcastURL = `${baseURL}${solcastDeviceID}/${isoDateToday}`
 
         try {
@@ -119,11 +130,19 @@ const DashCard = () => {
             const weekJson = await weekResult.json()
             setWeekData(weekJson)
 
+            const weekEnergyResult = await fetch(fullWeekEnergyURL)
+            const weekEnergyJson = await weekEnergyResult.json()
+            setWeekEnergyData(weekEnergyJson)
+
             //  console.log("billing URL", fullBillingURL)
         
             const billingResult = await fetch(fullBillingURL)
             const billingJson = await billingResult.json()
             setBillingData(billingJson)
+
+            const billingEnergyResult = await fetch(fullBillingEnergyURL)
+            const billingEnergyJson = await billingEnergyResult.json()
+            setBillingEnergyData(billingEnergyJson)
 
             console.log(`updated DashCard at ${isoTimeNow}`)
 
@@ -162,12 +181,12 @@ const DashCard = () => {
 
         const todayEnergy = rawTodayEnergyData[0].day_energy
         // console.log("today energy", todayEnergy)
-        var totalTodayEnergy = `${todayEnergy/1000} kWh`
+        var totalTodayEnergy = `${Math.round((todayEnergy/1000)*10)/10} kWh`
         // console.log("today energy for card", totalTodayEnergy)
 
         const todaySolcastMapData = rawTodaySolcastData.map(x=>x.pv_estimate)
         const todaySolcast = totalAttribute(todaySolcastMapData)
-        var totalTodaySolcast = `${todaySolcast/1000} kWh`
+        var totalTodaySolcast = `${wattsToKWH(todaySolcast)} kWh`
 
         const rawYesterdayData = yesterdayData.Items
         const rawYesterdayEnergyData = yesterdayEnergyData.Items
@@ -180,11 +199,14 @@ const DashCard = () => {
         const yesterdayFixedRevenue = totalAttribute(yesterdayFixedMapRevenue)
         var totalYesterdayFixedRevenue = `$${yesterdayFixedRevenue.toFixed(2)}`
 
-        const yesterdayEnergy = rawYesterdayEnergyData[0].te_anga_energy
+        const yesterdayEnergy = rawYesterdayEnergyData[0].day_total_energy
+        const yesterdayEstimatedEnergy = rawYesterdayEnergyData[0].day_total_estimated
         
-        var totalYesterdayEnergy = `${yesterdayEnergy/1000} kWh`
+        var totalYesterdayEnergy = `${wattsToKWH(yesterdayEnergy)} kWh`
+        var totalYesterdayEstimatedEnergy = `${wattsToKWH(yesterdayEstimatedEnergy)} kWh`
 
         const rawWeekData = weekData.Items
+        const rawWeekEnergyData = weekEnergyData.Items
 
         const weekSpotMapRevenue = rawWeekData.map(x=>x.tp_spot_revenue)
         const weekSpotRevenue = totalAttribute(weekSpotMapRevenue)
@@ -194,11 +216,17 @@ const DashCard = () => {
         const weekFixedRevenue = totalAttribute(weekFixedMapRevenue)
         var totalWeekFixedRevenue = `$${weekFixedRevenue.toFixed(2)}`
 
-        const weekMapEnergy = rawWeekData.map(x => x.tp_energy)
+        const weekMapEnergy = rawWeekEnergyData.map(x => x.day_total_energy)
         const weekEnergy = totalAttribute(weekMapEnergy)
-        var totalWeekEnergy = `${weekEnergy/1000} kWh`
+        var totalWeekEnergy = `${wattsToKWH(weekEnergy)} kWh`
+
+        const weekEstimatedMapEnergy = rawWeekEnergyData.map(x => x.day_total_estimated)
+        const weekEstimatedEnergy = totalAttribute(weekEstimatedMapEnergy)
+        console.log("week estimated map: ",weekEstimatedMapEnergy)
+        var totalWeekEstimatedEnergy = `${wattsToKWH(weekEstimatedEnergy)} kWh`
 
         const rawBillingData = billingData.Items
+        const rawBillingEnergyData = billingEnergyData.Items
 
         const billingSpotMapRevenue = rawBillingData.map(x=>x.tp_spot_revenue)
         const billingSpotRevenue = totalAttribute(billingSpotMapRevenue)
@@ -208,9 +236,13 @@ const DashCard = () => {
         const billingFixedRevenue = totalAttribute(billingFixedMapRevenue)
         var totalBillingFixedRevenue = `$${billingFixedRevenue.toFixed(2)}`
 
-        const billingMapEnergy = rawBillingData.map(x => x.tp_energy)
+        const billingMapEnergy = rawBillingEnergyData.map(x => x.day_total_energy)
         const billingEnergy = totalAttribute(billingMapEnergy)
-        var totalBillingEnergy = `${billingEnergy/1000} kWh`
+        var totalBillingEnergy = `${wattsToKWH(billingEnergy)} kWh`
+
+        const billingEstimatedMapEnergy = rawBillingEnergyData.map(x => x.day_total_estimated)
+        const billingEstimatedEnergy = totalAttribute(billingEstimatedMapEnergy)
+        var totalBillingEstimatedEnergy = `${wattsToKWH(billingEstimatedEnergy)} kWh`
 
     } 
     
@@ -222,10 +254,13 @@ const DashCard = () => {
                     <Card.Body>
                         <ul>
                             <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : totalTodayEnergy}</li>
-                            <li>Today Total Estimated: {isLoading? <Spinner animation="border" size="sm"/> : totalTodaySolcast}</li>
+                            <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : totalTodaySolcast}</li>
                             <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : totalYesterdayEnergy}</li>
+                            <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : totalYesterdayEstimatedEnergy}</li>
                             <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : totalWeekEnergy}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : totalBillingEnergy}</li>
+                            <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : totalWeekEstimatedEnergy}</li>
+                            <li>This billing period : {isLoading? <Spinner animation="border" size="sm"/> : totalBillingEnergy}</li>
+                            <li>This billing period (est): {isLoading? <Spinner animation="border" size="sm"/> : totalBillingEstimatedEnergy}</li>
                         </ul>
                     </Card.Body>
                 </Card>
