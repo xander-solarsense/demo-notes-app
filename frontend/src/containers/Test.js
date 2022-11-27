@@ -1,31 +1,17 @@
 import React, {useState, useEffect} from 'react'
-import { Chart as ChartJS, LineElement, BarElement, PointElement, CategoryScale, LinearScale, TimeScale, Tooltip, TimeSeriesScale, Title, Legend } from 'chart.js'
-import {Chart} from 'react-chartjs-2'
-import Container from 'react-bootstrap/Container'
-import 'date-fns'
-import 'chartjs-adapter-date-fns'
-import Button from 'react-bootstrap/Button'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
-import ChartDataLabels from 'chartjs-plugin-datalabels'
+import Card from 'react-bootstrap/Card'
+import CardGroup from 'react-bootstrap/CardGroup'
 import Spinner from 'react-bootstrap/Spinner'
+import axios from 'axios'
 
+const siteName = "te_anga"
 
+const wattsToKWH = (watts) => {
+    var KWH = (watts/1000).toFixed(1)
+    KWH = `${KWH} kWh`
 
-
-
-ChartJS.register(
-    LineElement,
-    PointElement,
-    CategoryScale,
-    LinearScale,
-    TimeScale,
-    Tooltip,
-    TimeSeriesScale,
-    Title,
-    ChartDataLabels,
-    Legend,
-    BarElement
-)
+    return KWH
+}
 
 function toIsoString(date) {
     var tzo = -date.getTimezoneOffset(),
@@ -43,195 +29,216 @@ function toIsoString(date) {
         dif + pad(Math.floor(Math.abs(tzo) / 60)) +
         ':' + pad(Math.abs(tzo) % 60);
   }
-  
-  const getIsoTimeNow = () => {
+
+const getIsoTimeNow = () => {
     var dt = new Date();
     var isoTime = toIsoString(dt);
 
     return isoTime
-  }
+}
 
- const getIsoTimeYesterday = () => {
-    var dtYesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000))
-    var isoTimeYesterday = toIsoString(dtYesterday)
+ const getIsoDateMinusDays = (days) => {
+    var dtLastMonth = new Date(new Date().setDate(new Date().getDate()-days))
+    var isoTimeLastMonth = toIsoString(dtLastMonth)
+    var isoDateLastMonth = isoTimeLastMonth.slice(0,10)
 
-    return isoTimeYesterday
+    return isoDateLastMonth
  }
 
+const formatDollars = (amount) => {
+    amount = amount.toFixed(2)
+    var formattedAmount = `$${amount}`
+
+    return formattedAmount
+}
 const Test = () => {
-    const inv_device_id = 'x_inv_tp'
-    const baseURL =  `https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/`
-
-    const sol_device_id = 'x_inv_solcast'
-
-    const [chart, setChart] = useState([])
-    const [isLoading, setIsLoading] = useState(true);
-    const [query, setQuery] = useState("Today")
-    const [estimate, setEstimate] = useState([])
+    const [todayData,setTodayData] = useState()
+    const [solcastData, setSolcastData] = useState()
+    const [isLoading,setIsLoading] = useState(true)
+    const [monthData, setMonthData] = useState()
+    const baseURL = 'https://nh80hr43o5.execute-api.us-east-1.amazonaws.com/items/'
+    const todayDeviceID = `${siteName}_tp`
+    const dayDeviceID = `${siteName}_day`
+    const solcastDeviceID = `${siteName}_solcast`
     
-    const fetchData = async () => {
-        var isoTimeYesterday = getIsoTimeYesterday()
+    const fetchData = async() => {
         var isoTimeNow = getIsoTimeNow()
         var isoDateToday = isoTimeNow.slice(0,10)
+        var isoDateMonthAgo = getIsoDateMinusDays(31)
 
-        if (query == "Today") {
-            var invQueryString = `${inv_device_id}/${isoDateToday}`
-            var solQueryString = `${sol_device_id}/${isoDateToday}`
-        } else if (query == "Last 24 Hours") {
-            var invQueryString = `${inv_device_id}/${isoTimeYesterday}/${isoTimeNow}`
-            var solQueryString = `${sol_device_id}/${isoTimeYesterday}/${isoTimeNow}`
-        }
+        const todayQueryString = `${isoDateToday}`
+        const monthQueryString = `${isoDateMonthAgo}/${isoDateToday}`
 
-        var invFullURL = `${baseURL}${invQueryString}`
-        var solFullURL = `${baseURL}${solQueryString}`
-       
-        try{
-        const invResult = await fetch(invFullURL)
-        const invJson = await invResult.json()
-        setChart(invJson)
-        console.log(`updated energy chart at: ${isoTimeNow}`)
-        console.log(`energy chart URL: ${invFullURL}`)
+        const fullSolcastURL = `${baseURL}${solcastDeviceID}/${isoDateToday}`
+        const fullMonthURL = `${baseURL}${dayDeviceID}/${monthQueryString}`
+        const fullTodayURL = `${baseURL}${todayDeviceID}/${todayQueryString}`
 
-        const solResult = await fetch(solFullURL)
-        const solJson = await solResult.json()
-        setEstimate(solJson)
+        try {
+            const monthResult = await axios.get(fullMonthURL)
+            const monthData = monthResult.data.Items
+            setMonthData(monthData)
+            // console.log("month data: ", monthData)
 
-        console.log(`updated energy chart at: ${isoTimeNow}`)
-        console.log(`energy chart URL: ${invFullURL}`)
-        
+            const todayResult = await axios.get(fullTodayURL)
+            const todayData = todayResult.data.Items
+            setTodayData(todayData)
+            // console.log("today data: ", todayData)
+
+            const solcastResult = await axios.get(fullSolcastURL)
+            const solcastData = solcastResult.data.Items
+            setSolcastData(solcastData)
+            // console.log("solcast data: ", solcastData)
+
         } catch (error) {
-            console.log(error);
+            console.log(error)
         }
-        setIsLoading(false);
-    };
-    
+        setIsLoading(false)
+    } 
     useEffect(() => {
         fetchData()
-        
-        // fetchData()
         const intervalId = setInterval(() => {
+            
             fetchData()
-        },60000)
+        },300000)
         return () => clearInterval(intervalId)
-    }, [query]);
+    },[])
     
-    
-
     if (! isLoading) {
-    
-    
-
-    let invData = chart.Items
-    let solData = estimate.Items
-
-    const combinedData = solData.map(x => ({...x, ...invData.find(tp => tp.trading_period === x.trading_period)}) )
-    console.log("Energy bar data", combinedData)
-    console.log("PV estimate data", combinedData.map(x => x.pv_estimate))
-
-    var data = {
-        labels: combinedData.map(x => x.trading_period),
-        datasets: [{
-            type: 'line',
-            label: `Estimated Energy`,
-            data: combinedData.map(x => x.pv_estimate),
-            backgroundColor: [
-                'green',
-            ],
-            borderColor: [
-                'green',
-            ],
-            borderWidth: [
-                2
-            ],
-            borderDash: [
-                8,10
-            ],
-            pointRadius: 0,
-        },
-        {
-            type: 'bar',
-            lineTension: 0.3,
-            pointRadius: 1,
-            label: `Actual Energy`,
-            data: combinedData.map(x => x.tp_energy),
-            backgroundColor: [
-                'orange',
-            ],
-            borderColor: [
-                'orange',
-            ],
-            borderWidth: 0,
-            datalabels: {
-                display: false
-              },
-            borderRadius: 3
-
-        },
-    ]
-    }
-    var options = {
-        plugins: {
-            legend: {
-              display: true
-            },  
-            title:{
-                display: true,
-                text: `Energy per Trading Period ${query}`
-                }, 
-            datalabels: {
-                display: false
-            },
-        },
-        responsive: true,
-        interaction: {
-            mode: 'index',
-            intersect: false
-        },
+        const today = new Date()
+        today.setHours(0,0,0,0)
+        const yesterday = new Date(new Date().setDate(new Date().getDate()-1))
+        const yesterdayStart = yesterday.setHours(0,0,0,0)
+        const yesterdayEnd = yesterday.setHours(23,59,59,0)
+        const sevenDaysAgo = new Date(new Date().setDate(new Date().getDate()-7))
+        sevenDaysAgo.setHours(0,0,0,0)
+        const billingStart = new Date()
+        billingStart.setHours(0,0,0,0)
+        billingStart.setDate(1)
+        var lastWeekData = []
+        var billingData = []
+        var yesterdayData = []
         
-        scales: {
-            x: {
-                // type: 'time',
-                title: {
-                    display: true,
-                    text: 'Trading Period'
-                }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: 'Power in Wh'
-                },
-                min: 0
+        monthData.forEach(element => {
+            if (new Date(element.timestamp) <= yesterdayEnd && new Date(element.timestamp) >= yesterdayStart){
+                yesterdayData.push(element)
             }
-         }
-    }
-    return (
-        <div>
-            <Container className="mt-2">
-                <ButtonGroup size="sm" className="mb-3">
-                    <Button onClick = {() => {
-                        setQuery("Today")
-                        }}>Today
-                    </Button>
-                    <Button onClick = {() => {
-                        setQuery("Last 24 Hours")
-                        }}>Last 24 Hours
-                    </Button>
-                    
-                </ButtonGroup>
-                <Chart
-                type = 'bar'
-                data = {data}
-                options = {options}
-                />
-            </Container>
+            if (new Date(element.timestamp) <= yesterday && new Date(element.timestamp) >= sevenDaysAgo){
+                lastWeekData.push(element)
+            } 
+            if (new Date(element.timestamp) <= yesterday && new Date(element.timestamp) >= billingStart){
+                billingData.push(element)
+            } 
+        })
+        var todayEnergy = todayData.reduce((total, current) => total + current.tp_energy,0)
+        // console.log("total Energy today: ", todayEnergy)
+        todayEnergy = wattsToKWH(todayEnergy)
+
+        var todayEstimatedEnergy = solcastData.reduce((total, current) => total + current.pv_estimate,0)
+        // console.log("total Energy estimated today: ", todayEstimatedEnergy)
+        todayEstimatedEnergy = wattsToKWH(todayEstimatedEnergy)
+
+        var todaySpotRevenue = todayData.reduce((total, current) => total + current.tp_spot_revenue, 0)
+        todaySpotRevenue = formatDollars(todaySpotRevenue)
+        // console.log("total Spot Revenue today: ", todaySpotRevenue)
+
+        var todayFixedRevenue = todayData.reduce((total, current) => total + current.tp_fixed_revenue, 0)
+        todayFixedRevenue = formatDollars(todayFixedRevenue)
+        // console.log("total Fixed Revenue today: ", todayFixedRevenue)
+        
+        var yesterdayEnergy = yesterdayData.reduce((total, current) => total + current.day_total_energy,0)
+        yesterdayEnergy = wattsToKWH(yesterdayEnergy)
+        // console.log("total Energy yesterday: ", yesterdayEnergy)
+        
+        var yesterdayEstimatedEnergy = yesterdayData.reduce((total, current) => total + current.day_total_estimated,0)
+        yesterdayEstimatedEnergy = wattsToKWH(yesterdayEstimatedEnergy)
+        // console.log("total Energy yesterday: ", yesterdayEstimatedEnergy)
+
+        var yesterdaySpotRevenue = yesterdayData.reduce((total, current) => total + current.day_total_spot_revenue, 0)
+        yesterdaySpotRevenue = formatDollars(yesterdaySpotRevenue)
+        // console.log("total Spot Revenue yesterday: ", yesterdaySpotRevenue)
+
+        var yesterdayFixedRevenue = yesterdayData.reduce((total, current) => total + current.day_total_fixed_revenue, 0)
+        yesterdayFixedRevenue = formatDollars(yesterdayFixedRevenue)
+        // console.log("total Fixed Revenue yesterday: ", yesterdayFixedRevenue)
+        
+        var lastWeekEnergy = lastWeekData.reduce((total, current) => total + current.day_total_energy,0)
+        lastWeekEnergy = wattsToKWH(lastWeekEnergy)
+        // console.log("total Energy week: ", lastWeekEnergy)
+
+        var lastWeekEstimatedEnergy = lastWeekData.reduce((total, current) => total + current.day_total_estimated,0)
+        lastWeekEstimatedEnergy = wattsToKWH(lastWeekEstimatedEnergy)
+        // console.log("total Energy week: ", lastWeekEstimatedEnergy)
+
+        var lastWeekSpotRevenue = lastWeekData.reduce((total, current) => total + current.day_total_spot_revenue, 0)
+        lastWeekSpotRevenue = formatDollars(lastWeekSpotRevenue)
+        // console.log("total Spot Revenue week: ", lastWeekSpotRevenue)
+
+        var lastWeekFixedRevenue = lastWeekData.reduce((total, current) => total + current.day_total_fixed_revenue, 0)
+        lastWeekFixedRevenue = formatDollars(lastWeekFixedRevenue)
+        // console.log("total Fixed Revenue week: ", lastWeekFixedRevenue)
+        
+        var billingEnergy = billingData.reduce((total, current) => total + current.day_total_energy,0)
+        billingEnergy = wattsToKWH(billingEnergy)
+        // console.log("total Energy billing: ", billingEnergy)
+
+        var billingEstimatedEnergy = billingData.reduce((total, current) => total + current.day_total_estimated,0)
+        billingEstimatedEnergy = wattsToKWH(billingEstimatedEnergy)
+        // console.log("total est Energy billing: ", billingEstimatedEnergy)
+
+        var billingSpotRevenue = billingData.reduce((total, current) => total + current.day_total_spot_revenue, 0)
+        billingSpotRevenue = formatDollars(billingSpotRevenue)
+        // console.log("total Spot Revenue billing: ", billingSpotRevenue)
+
+        var billingFixedRevenue = billingData.reduce((total, current) => total + current.day_total_fixed_revenue, 0)
+        billingFixedRevenue = formatDollars(billingFixedRevenue)
+        // console.log("total Fixed Revenue billing: ", billingFixedRevenue)
+    } 
+    
+    return(
+        <div>     
+            <CardGroup>
+                <Card className='mb-3 mt-3'>
+                    <Card.Title className='mt-2'>&nbsp;Total Energy</Card.Title>
+                    <Card.Body>
+                        <ul>
+                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : todayEnergy}</li>
+                            <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : todayEstimatedEnergy}</li>
+                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : yesterdayEnergy}</li>
+                            <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : yesterdayEstimatedEnergy}</li> 
+                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : lastWeekEnergy}</li>
+                            <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : lastWeekEstimatedEnergy}</li>
+                            <li>This billing period : {isLoading? <Spinner animation="border" size="sm"/> : billingEnergy}</li>
+                            <li>This billing period (est): {isLoading? <Spinner animation="border" size="sm"/> : billingEstimatedEnergy}</li> 
+                        </ul>
+                    </Card.Body>
+                </Card>
+        
+                <Card className='mb-3 mt-3'>
+                    <Card.Title className='mt-2'>&nbsp;Total Revenue: Spot Price</Card.Title>
+                    <Card.Body>
+                        <ul>
+                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : todaySpotRevenue}</li>
+                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : yesterdaySpotRevenue}</li>
+                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : lastWeekSpotRevenue}</li>
+                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : billingSpotRevenue}</li>
+                        </ul>
+                    </Card.Body>
+                </Card>
+                <Card className='mb-3 mt-3'>
+                    <Card.Title className='mt-2'>&nbsp;Total Revenue: Fixed Price</Card.Title>
+                    <Card.Body>
+                        <ul>
+                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : todayFixedRevenue}</li>
+                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : yesterdayFixedRevenue}</li>
+                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : lastWeekFixedRevenue}</li>
+                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : billingFixedRevenue}</li>
+                        </ul>
+                    </Card.Body>
+                </Card>
+            </CardGroup>
         </div>
     )
-} else {
-    return (
-        <Spinner animation="border" />
-    )
-}
+    
 }
 
 export default Test
