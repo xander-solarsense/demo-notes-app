@@ -89,14 +89,15 @@ const EnergyBarTP = () => {
         var isoDateToday = isoTimeNow.slice(0,10)
         var isoTimeLastWeek = getIsoTimeLastWeek()
         var isoTimeLast30 = getIsoTimeLast30()
+        var isoDateYesterday = isoTimeYesterday.slice(0,10)
        
 
         if (query == "Today") {
             var invQueryString = `${inv_device_id_tp}/${isoDateToday}`
             var solQueryString = `${sol_device_id_tp}/${isoDateToday}`
-        } else if (query == "Last 24 Hours") {
-            var invQueryString = `${inv_device_id_tp}/${isoTimeYesterday}/${isoTimeNow}`
-            var solQueryString = `${sol_device_id_tp}/${isoTimeYesterday}/${isoTimeNow}`
+        } else if (query == "Yesterday") {
+            var invQueryString = `${inv_device_id_tp}/${isoDateYesterday}`
+            var solQueryString = `${sol_device_id_tp}/${isoDateYesterday}`
         } else if (query == "Last 7 Days") {
             var invQueryString = `${inv_device_id_day}/${isoTimeLastWeek}/${isoTimeNow}`
             var solQueryString = `${sol_device_id_tp}/${isoTimeLastWeek}/${isoTimeNow}`
@@ -142,7 +143,7 @@ const EnergyBarTP = () => {
     
 
     if (! isLoading) {
-    if (query == "Today" | query == "Last 24 Hours"){
+    if (query == "Today" | query == "Yesterday"){
     
 
     let invData = chart.Items
@@ -306,8 +307,8 @@ var options = {
                         }}>Today
                     </Button>
                     <Button onClick = {() => {
-                        setQuery("Last 24 Hours")
-                        }}>Last 24 Hours
+                        setQuery("Yesterday")
+                        }}>Yesterday
                     </Button>
                     <Button onClick = {() => {
                         setQuery("Last 7 Days")

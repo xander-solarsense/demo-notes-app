@@ -67,11 +67,12 @@ export default function RevenueBarTP() {
         var isoTimeYesterday = getIsoTimeYesterday()
         var isoTimeNow = getIsoTimeNow()
         var isoDateToday = isoTimeNow.slice(0,10)
+        var isoDateYesterday = isoTimeYesterday.slice(0,10)
 
         if (query == "Today") {
             var queryString = `${device_id}/${isoDateToday}`
-        } else if (query == "Last 24 Hours") {
-            var queryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
+        } else if (query == "Yesterday") {
+            var queryString = `${device_id}/${isoDateYesterday}`
         }
 
         var fullURL = `${baseURL}${queryString}`
@@ -184,8 +185,8 @@ export default function RevenueBarTP() {
                         }}>Today
                     </Button>
                     <Button onClick = {() => {
-                        setQuery("Last 24 Hours")
-                        }}>Last 24 Hours
+                        setQuery("Yesterday")
+                        }}>Yesterday
                     </Button>
                     
                 </ButtonGroup>

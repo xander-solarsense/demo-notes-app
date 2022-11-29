@@ -77,11 +77,12 @@ const SpotLine = () => {
         var isoTimeNow = getIsoTimeNow()
         var isoDateToday = isoTimeNow.slice(0,10)
         var isoTimeLastWeek = getIsoTimeLastWeek()
+        var isoDateYesterday = isoTimeYesterday.slice(0,10)
         
         if (query == "Today") {
             var queryString = `${device_id}/${isoDateToday}`
-        } else if (query == "Last 24 Hours") {
-            var queryString = `${device_id}/${isoTimeYesterday}/${isoTimeNow}`
+        } else if (query == "Yesterday") {
+            var queryString = `${device_id}/${isoDateYesterday}`
         } else if (query == "Last 7 Days") {
             var queryString = `${device_id}/${isoTimeLastWeek}/${isoTimeNow}`
         }
@@ -178,9 +179,9 @@ const SpotLine = () => {
                         }}>Today
                     </Button>
                     <Button onClick = {() => {
-                        setQuery("Last 24 Hours")
+                        setQuery("Yesterday")
                         console.log("query",{query})
-                        }}>Last 24 Hours
+                        }}>Yesterday
                     </Button>
                     <Button onClick = {() => {
                         setQuery("Last 7 Days")
