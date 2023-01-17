@@ -18,6 +18,7 @@ import Dashboard from './containers/Dashboard'
 import "./App.css"
 import Test from './containers/Test'
 import Errors from "./containers/Errors";
+import DashCardIrvine from "./containers/DashCardIrvine";
 
 export default function App() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -68,17 +69,26 @@ async function handleLogout() {
           <Navbar.Collapse className="justify-content-end">
             <Nav>
               {isAuthenticated ? (
+              <>
+                <LinkContainer to="/irvine">
+                  <Nav.Link>Irvine Rd</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/">
+                  <Nav.Link>Te Anga</Nav.Link>
+                </LinkContainer>
                 <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
-              ) : (
+                
+              </>) : (
                 <>
                   {/* <LinkContainer to="/signup">
                     <Nav.Link>Signup</Nav.Link>
-                  </LinkContainer> */}
+                  </LinkContainer>  */}
                   <LinkContainer to="/login">
                     <Nav.Link>Login</Nav.Link>
                   </LinkContainer>
                 </>
               )}
+              
             </Nav>
           </Navbar.Collapse>
           </Navbar>
@@ -91,6 +101,7 @@ async function handleLogout() {
           <Route path="signup" element={isAuthenticated ? <Signup /> : <Login />}/>
           <Route path="dashboard" element={<Dashboard/>} />
           <Route path="errors" element={<Errors/>} />
+          <Route path="irvine" element={<DashCardIrvine/>} />
           {/* <Route path="test" element={<Test/>} /> */}
           <Route path="*" element={<NotFound />}/>
         </Routes>
