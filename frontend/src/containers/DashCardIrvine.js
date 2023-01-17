@@ -4,6 +4,7 @@ import CardGroup from 'react-bootstrap/CardGroup'
 import Spinner from 'react-bootstrap/Spinner'
 import axios from 'axios'
 import Row from 'react-bootstrap/Row'
+import Accordion from 'react-bootstrap/Accordion'
 
 const siteName = "irvine"
 const fixedPanelMax = 17.6
@@ -333,133 +334,134 @@ const DashCardIrvine = () => {
     
     return(
         <div>     
-            <Row>
-                <CardGroup>
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Total Energy</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedTodayEnergy + fixedTodayEnergy)}</li>
-                            <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedTodayEstimatedEnergy + fixedTodayEstimatedEnergy)}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEnergy + fixedYesterdayEnergy)}</li>
-                            <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEstimatedEnergy + fixedYesterdayEstimatedEnergy)}</li> 
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEnergy + fixedLastWeekEnergy)}</li>
-                            <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEstimatedEnergy + fixedLastWeekEstimatedEnergy)}</li>
-                            <li>This billing period : {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEnergy + fixedBillingEnergy)}</li>
-                            <li>This billing period (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEstimatedEnergy + fixedBillingEstimatedEnergy)}</li> 
-                        </ul>
-                    </Card.Body>
-                </Card>
-        
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Total Revenue: Spot Price</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodaySpotRevenue + fixedTodaySpotRevenue)}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdaySpotRevenue + fixedYesterdaySpotRevenue)}</li>
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekSpotRevenue + fixedLastWeekSpotRevenue)}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingSpotRevenue + fixedBillingSpotRevenue)}</li>
-                        </ul>
-                    </Card.Body>
-                </Card>
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Total Revenue: Fixed Price</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodayFixedRevenue + fixedTodayFixedRevenue)}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdayFixedRevenue + fixedYesterdayFixedRevenue)}</li>
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekFixedRevenue + fixedLastWeekFixedRevenue)}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingFixedRevenue + fixedBillingFixedRevenue)}</li>
-                        </ul>
-                    </Card.Body>
-                </Card>
-            </CardGroup>
-            </Row>
-            <Row>
-                <CardGroup>
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Tracked Energy</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedTodayEnergy)}{formatPer(trackedTodayEnergy, fixedTodayEnergy)}</li>
-                            {/* <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedTodayEstimatedEnergy)}</li> */}
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEnergy)}{formatPer(trackedYesterdayEnergy, fixedYesterdayEnergy)}</li>
-                            {/* <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEstimatedEnergy)}</li>  */}
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEnergy)}{formatPer(trackedLastWeekEnergy, fixedLastWeekEnergy)}</li>
-                            {/* <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEstimatedEnergy)}</li> */}
-                            <li>This billing period : {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEnergy)}{formatPer(trackedBillingEnergy, fixedBillingEnergy)}</li>
-                            {/* <li>This billing period (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEstimatedEnergy)}</li>  */}
-                        </ul>
-                    </Card.Body>
-                </Card>
-        
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Tracked Revenue: Spot Price</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodaySpotRevenue)}{formatPer(trackedTodaySpotRevenue, fixedTodaySpotRevenue)}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdaySpotRevenue)}{formatPer(trackedYesterdaySpotRevenue, fixedYesterdaySpotRevenue)}</li>
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekSpotRevenue)}{formatPer(trackedLastWeekSpotRevenue, fixedLastWeekSpotRevenue)}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingSpotRevenue)}{formatPer(trackedBillingSpotRevenue, fixedBillingSpotRevenue)}</li>
-                        </ul>
-                    </Card.Body>
-                </Card>
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Tracked Revenue: Fixed Price</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodayFixedRevenue)}{formatPer(trackedTodayFixedRevenue, fixedTodayFixedRevenue)}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdayFixedRevenue)}{formatPer(trackedYesterdayFixedRevenue, fixedYesterdayFixedRevenue)}</li>
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekFixedRevenue)}{formatPer(trackedLastWeekFixedRevenue, fixedLastWeekFixedRevenue)}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingFixedRevenue)}{formatPer(trackedBillingFixedRevenue, fixedBillingFixedRevenue)}</li>
-                        </ul>
-                    </Card.Body>
-                </Card>
-            </CardGroup>
-            </Row>
-            <Row>
-                <CardGroup>
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Fixed Energy</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedTodayEnergy)}</li>
-                            {/* <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedTodayEstimatedEnergy)}</li> */}
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedYesterdayEnergy)}</li>
-                            {/* <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedYesterdayEstimatedEnergy)}</li>  */}
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedLastWeekEnergy)}</li>
-                            {/* <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedLastWeekEstimatedEnergy)}</li> */}
-                            <li>This billing period : {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedBillingEnergy)}</li>
-                            {/* <li>This billing period (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedBillingEstimatedEnergy)}</li>  */}
-                        </ul>
-                    </Card.Body>
-                </Card>
-        
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Fixed Revenue: Spot Price</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedTodaySpotRevenue)}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedYesterdaySpotRevenue)}</li>
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedLastWeekSpotRevenue)}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedBillingSpotRevenue)}</li>
-                        </ul>
-                    </Card.Body>
-                </Card>
-                <Card className='mb-3 mt-3'>
-                    <Card.Title className='mt-2'>&nbsp;Fixed Revenue: Fixed Price</Card.Title>
-                    <Card.Body>
-                        <ul>
-                            <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedTodayFixedRevenue)}</li>
-                            <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedYesterdayFixedRevenue)}</li>
-                            <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedLastWeekFixedRevenue)}</li>
-                            <li>This billing period (calendar month): {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedBillingFixedRevenue)}</li>
-                        </ul>
-                    </Card.Body>
-                </Card>
-            </CardGroup>
-            </Row>
-        </div>
+            <CardGroup>
+            <Card className='mb-3 mt-3'>
+                <Card.Title className='mt-2'>&nbsp;Total Energy</Card.Title>
+                <Card.Body>
+                    <ul>
+                        <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : `${wattsToKWH(trackedTodayEnergy + fixedTodayEnergy)}`}</li>
+                        <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedTodayEstimatedEnergy + fixedTodayEstimatedEnergy)}</li>
+                        <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEnergy + fixedYesterdayEnergy)}</li>
+                        <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEstimatedEnergy + fixedYesterdayEstimatedEnergy)}</li> 
+                        <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEnergy + fixedLastWeekEnergy)}</li>
+                        <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEstimatedEnergy + fixedLastWeekEstimatedEnergy)}</li>
+                        <li>This calendar month : {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEnergy + fixedBillingEnergy)}</li>
+                        <li>This calendar month (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEstimatedEnergy + fixedBillingEstimatedEnergy)}</li> 
+                    </ul>
+                </Card.Body>
+                <Card.Footer className='bg-transparent border-0'>
+                    <Accordion alwaysOpen>
+                        <Accordion.Item eventKey='0'>
+                            <Accordion.Header>Tracked</Accordion.Header>
+                            <Accordion.Body>
+                            <ul>
+                                <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedTodayEnergy)}{formatPer(trackedTodayEnergy, fixedTodayEnergy)}</li>
+                                {/* <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedTodayEstimatedEnergy)}</li> */}
+                                <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEnergy)}{formatPer(trackedYesterdayEnergy, fixedYesterdayEnergy)}</li>
+                                {/* <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedYesterdayEstimatedEnergy)}</li>  */}
+                                <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEnergy)}{formatPer(trackedLastWeekEnergy, fixedLastWeekEnergy)}</li>
+                                {/* <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedLastWeekEstimatedEnergy)}</li> */}
+                                <li>This calendar month : {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEnergy)}{formatPer(trackedBillingEnergy, fixedBillingEnergy)}</li>
+                                {/* <li>This calendar month (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(trackedBillingEstimatedEnergy)}</li>  */}
+                            </ul>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item eventKey='1'>
+                            <Accordion.Header>Fixed</Accordion.Header>
+                            <Accordion.Body>
+                            <ul>
+                                <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedTodayEnergy)}</li>
+                                {/* <li>Today (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedTodayEstimatedEnergy)}</li> */}
+                                <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedYesterdayEnergy)}</li>
+                                {/* <li>Yesterday (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedYesterdayEstimatedEnergy)}</li>  */}
+                                <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedLastWeekEnergy)}</li>
+                                {/* <li>Previous 7 days (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedLastWeekEstimatedEnergy)}</li> */}
+                                <li>This calendar month : {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedBillingEnergy)}</li>
+                                {/* <li>This calendar month (est): {isLoading? <Spinner animation="border" size="sm"/> : wattsToKWH(fixedBillingEstimatedEnergy)}</li>  */}
+                            </ul>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    </Accordion>
+                </Card.Footer>
+            </Card>
+    
+            <Card className='mb-3 mt-3'>
+                <Card.Title className='mt-2'>&nbsp;Total Revenue: Spot Price</Card.Title>
+                <Card.Body>
+                    <ul>
+                        <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodaySpotRevenue + fixedTodaySpotRevenue)}</li>
+                        <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdaySpotRevenue + fixedYesterdaySpotRevenue)}</li>
+                        <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekSpotRevenue + fixedLastWeekSpotRevenue)}</li>
+                        <li>This calendar month: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingSpotRevenue + fixedBillingSpotRevenue)}</li>
+                    </ul>
+                </Card.Body>
+                <Card.Footer className='bg-transparent border-0'>
+                    <Accordion alwaysOpen>
+                        <Accordion.Item eventKey='0'>
+                            <Accordion.Header>Tracked</Accordion.Header>
+                            <Accordion.Body>
+                            <ul>
+                                <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodaySpotRevenue)}{formatPer(trackedTodaySpotRevenue, fixedTodaySpotRevenue)}</li>
+                                <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdaySpotRevenue)}{formatPer(trackedYesterdaySpotRevenue, fixedYesterdaySpotRevenue)}</li>
+                                <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekSpotRevenue)}{formatPer(trackedLastWeekSpotRevenue, fixedLastWeekSpotRevenue)}</li>
+                                <li>This calendar month: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingSpotRevenue)}{formatPer(trackedBillingSpotRevenue, fixedBillingSpotRevenue)}</li>
+                            </ul>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item eventKey='1'>
+                            <Accordion.Header>Fixed</Accordion.Header>
+                            <Accordion.Body>
+                            <ul>
+                                <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedTodaySpotRevenue)}</li>
+                                <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedYesterdaySpotRevenue)}</li>
+                                <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedLastWeekSpotRevenue)}</li>
+                                <li>This calendar month: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedBillingSpotRevenue)}</li>
+                            </ul>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    </Accordion>
+                </Card.Footer>
+            </Card>
+            <Card className='mb-3 mt-3'>
+                <Card.Title className='mt-2'>&nbsp;Total Revenue: Fixed Price</Card.Title>
+                <Card.Body>
+                    <ul>
+                        <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodayFixedRevenue + fixedTodayFixedRevenue)}</li>
+                        <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdayFixedRevenue + fixedYesterdayFixedRevenue)}</li>
+                        <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekFixedRevenue + fixedLastWeekFixedRevenue)}</li>
+                        <li>This calendar month: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingFixedRevenue + fixedBillingFixedRevenue)}</li>
+                    </ul>
+                </Card.Body>
+                    <Card.Footer className='bg-transparent border-0'>
+                        <Accordion alwaysOpen>
+                        <Accordion.Item eventKey='0'>
+                            <Accordion.Header>Tracked</Accordion.Header>
+                            <Accordion.Body>
+                            <ul>
+                                <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedTodayFixedRevenue)}{formatPer(trackedTodayFixedRevenue, fixedTodayFixedRevenue)}</li>
+                                <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedYesterdayFixedRevenue)}{formatPer(trackedYesterdayFixedRevenue, fixedYesterdayFixedRevenue)}</li>
+                                <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedLastWeekFixedRevenue)}{formatPer(trackedLastWeekFixedRevenue, fixedLastWeekFixedRevenue)}</li>
+                                <li>This calendar month: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(trackedBillingFixedRevenue)}{formatPer(trackedBillingFixedRevenue, fixedBillingFixedRevenue)}</li>
+                            </ul>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item eventKey='1'>
+                            <Accordion.Header>Fixed</Accordion.Header>
+                            <Accordion.Body>
+                            <ul>
+                                <li>Today: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedTodayFixedRevenue)}</li>
+                                <li>Yesterday: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedYesterdayFixedRevenue)}</li>
+                                <li>Previous 7 days: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedLastWeekFixedRevenue)}</li>
+                                <li>This calendar month: {isLoading? <Spinner animation="border" size="sm"/> : formatDollars(fixedBillingFixedRevenue)}</li>
+                            </ul>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        </Accordion>
+                        </Card.Footer>
+                
+            </Card>
+        </CardGroup>    
+    </div>
     )
     
 }
