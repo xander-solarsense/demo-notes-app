@@ -102,8 +102,6 @@ const StatusIrvine = () => {
         } else {
             var bgcolor = 'warning'
             var inverterMsg = <a href="https://www.fallonsolutions.com.au/solar/information/fronius-inverter-error-codes">Refer to Fronius error codes</a>
-            var status = 'warning'
-    
         }
         
         return (
@@ -112,7 +110,6 @@ const StatusIrvine = () => {
             <Card.Body>
                 {formatStatus(inv1Status, inv2Status, fixedStatus)}
                 <p>{inverterMsg}</p>
-    
             </Card.Body>
          </Card>
      )
