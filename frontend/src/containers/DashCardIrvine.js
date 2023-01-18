@@ -120,7 +120,7 @@ const DashCardIrvine = () => {
             const trackedTodayResult = await axios.get(fullTrackedTodayURL)
             const trackedTodayData = trackedTodayResult.data.Items
             setTrackedTodayData(trackedTodayData)
-            // console.log("today data: ", todayData)
+            console.log("today data: ", trackedTodayData)
 
             const fixedTodayResult = await axios.get(fullFixedTodayURL)
             const fixedTodayData = fixedTodayResult.data.Items
@@ -192,6 +192,7 @@ const DashCardIrvine = () => {
                 fixedBillingData.push(element)
             } 
         })
+        console.log("yesterday fixed data: ", fixedYesterdayData)
         // console.log("today data", todayData.slice(-1)[0].energy_day)
         var trackedTodayEnergy = trackedTodayData.slice(-1)[0].energy_day
         // trackedTodayEnergy = wattsToKWH(trackedTodayEnergy)

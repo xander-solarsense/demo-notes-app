@@ -19,6 +19,7 @@ import "./App.css"
 import Test from './containers/Test'
 import Errors from "./containers/Errors";
 import DashCardIrvine from "./containers/DashCardIrvine";
+import StatusIrvine from './containers/StatusIrvine'
 
 export default function App() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -102,6 +103,7 @@ async function handleLogout() {
           <Route path="dashboard" element={<Dashboard/>} />
           <Route path="errors" element={<Errors/>} />
           <Route path="irvine" element={<DashCardIrvine/>} />
+          <Route path="status" element={<StatusIrvine/>} />
           {/* <Route path="test" element={<Test/>} /> */}
           <Route path="*" element={<NotFound />}/>
         </Routes>
