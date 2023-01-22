@@ -62,7 +62,7 @@ const Dashboard = () => {
               </Col>
               <Col>
                 <Card className='mt-3 mb-3'>
-                  {/* <SpotLine /> */}
+                  <SpotLine />
                 </Card>
               </Col>
             </Row>
